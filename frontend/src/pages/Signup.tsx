@@ -56,7 +56,7 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-tr from-sky-100 via-white to-sky-200">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-tr from-sky-100 via-white to-sky-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
       <div className="w-full max-w-md">
         <GlassCard className="relative overflow-hidden border border-white/50 shadow-2xl shadow-sky-200/50">
           <div className="absolute -top-16 -left-16 h-32 w-32 bg-sky-300/30 rounded-full blur-2xl"></div>

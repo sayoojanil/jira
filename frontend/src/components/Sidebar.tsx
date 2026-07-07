@@ -51,21 +51,18 @@ const Sidebar: React.FC = () => {
   const navLinks = getLinks();
 
   return (
-    <aside className="w-64 glass-panel shrink-0 hidden md:flex flex-col gap-6 p-6 min-h-[calc(100vh-76px)] border-r border-sky-100/50">
-      {/* User Section summary */}
-      <div className="flex flex-col items-center gap-2 pb-6 border-b border-sky-100/30">
-       
-        <div className="text-center mt-2">
+    <aside className="glass-panel hidden w-72 shrink-0 flex-col gap-6 rounded-[28px] border border-white/70 bg-white/70 p-5 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.2)] md:flex md:min-h-[calc(100vh-96px)]">
+      <div className="flex flex-col items-center gap-2 border-b border-sky-100/40 pb-6">
+        <div className="mt-2 text-center">
           <div className="font-semibold text-slate-800">{user?.name}</div>
-          <div className="text-xs text-sky-500 font-medium capitalize mt-0.5">
+          <div className="mt-1 text-xs font-medium capitalize text-sky-600">
             {user?.role?.replace('_', ' ')}
           </div>
         </div>
       </div>
 
-      {/* Main navigation menu */}
-      <nav className="flex-1 flex flex-col gap-2">
-        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
+      <nav className="flex flex-1 flex-col gap-2">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.32em] text-slate-400">
           Main Menu
         </div>
         {navLinks.map((link) => (
@@ -73,10 +70,10 @@ const Sidebar: React.FC = () => {
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-full !bg-sky-700 text-white text-sm font-medium transition-all duration-200 ${
+              `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
                 isActive
-                  ? '!bg-sky-700 text-white shadow-md shadow-sky-200/50'
-                  : 'text-slate-600 hover:bg-sky-50/70 hover:text-sky-600'
+                  ? 'bg-sky-700 text-white shadow-lg shadow-sky-200/70'
+                  : 'text-slate-600 hover:bg-white/70 hover:text-sky-600'
               }`
             }
           >
@@ -86,10 +83,9 @@ const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* Workspace Footer details */}
-      <div className="pt-4 border-t border-sky-100/30 text-center">
+      <div className="border-t border-sky-100/40 pt-4 text-center">
         <div className="text-[10px] text-slate-400">Freelance Management v1.0</div>
-        <div className="text-[9px] text-sky-500 font-semibold mt-1">Light Blue Theme</div>
+        <div className="mt-1 text-[9px] font-semibold text-sky-600">Elevated workspace</div>
       </div>
     </aside>
   );

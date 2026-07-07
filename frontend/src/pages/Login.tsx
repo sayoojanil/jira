@@ -65,18 +65,19 @@ function handleClick() {
   };
 
   return (
-    <div className="min-h-screen w-full  flex items-center justify-center p-4 ">
+    <div className="flex min-h-screen w-full items-center justify-center bg-transparent p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-md">
-        <GlassCard className="relative overflow-hidden border rounded-none border-white/50 shadow-xl shadow-sky-200/50">
-          {/* Accent light elements */}
-          {/* <div className="absolute -top-16 -left-16 h-32 w-32 bg-sky-300/30 rounded-full blur-2xl"></div>
-          <div className="absolute -bottom-16 -right-16 h-32 w-32 bg-indigo-300/30 rounded-full blur-2xl"></div> */}
+        <GlassCard className="relative overflow-hidden rounded-[32px] border border-white/70 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.25)]">
+          <div className="pointer-events-none absolute -left-10 top-0 h-28 w-28 rounded-full bg-sky-300/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-10 -right-8 h-28 w-28 rounded-full bg-indigo-300/20 blur-3xl" />
 
           <div className="relative">
-            {/* Logo area */}
-            <div className="flex flex-col items-center mb-8">
-              <h2 className="text-2xl font-bold text-slate-800">Welcome Back</h2>
-              <p className="text-sm text-slate-500 mt-1">Sign in to manage your freelance projects</p>
+            <div className="mb-8 flex flex-col items-center text-center">
+              <div className="mb-3 inline-flex rounded-full border border-sky-100/80 bg-sky-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-sky-700">
+                TaskFlow
+              </div>
+              <h2 className="text-3xl font-semibold tracking-tight text-slate-800">Welcome back</h2>
+              <p className="mt-2 text-sm text-slate-500">Sign in to manage your freelance projects with calm clarity.</p>
             </div>
 
             {/* Error alerts */}
@@ -106,7 +107,7 @@ function handleClick() {
                       },
                     })}
                     placeholder="name@example.com"
-                    className="w-full pl-10 pr-4 py-3 rounded-none border border-sky-100/80 bg-white/50 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-all"
+                    className="w-full rounded-2xl border border-sky-100/80 bg-white/70 py-3 pl-10 pr-4 text-sm text-slate-700 transition-all focus:border-sky-500 focus:bg-white focus:outline-none"
                   />
                 </div>
                 {errors.email && (
@@ -137,7 +138,7 @@ function handleClick() {
                       required: 'Password is required',
                     })}
                     placeholder="Enter your password"
-                    className="w-full pl-10 pr-10 py-3 rounded-none border border-sky-100/80 bg-white/50 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-all"
+                    className="w-full rounded-2xl border border-sky-100/80 bg-white/70 py-3 pl-10 pr-10 text-sm text-slate-700 transition-all focus:border-sky-500 focus:bg-white focus:outline-none"
                   />
                   <button
                     type="button"
@@ -156,7 +157,7 @@ function handleClick() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 !bg-sky-700 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold rounded-full shadow-md shadow-sky-200 hover:shadow-lg hover:shadow-sky-300 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-sky-700 px-4 py-3 font-semibold text-white shadow-lg shadow-sky-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-600 hover:shadow-sky-300 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="animate-spin" size={18} /> : 'Sign In'}
               </button>
@@ -165,7 +166,7 @@ function handleClick() {
  <button
   type="button"
   onClick={handleClick}
-  className="w-full py-3 px-4 hover:from-sky-600 hover:to-indigo-700 text-black font-semibold rounded-full shadow-md shadow-sky-200 hover:shadow-lg hover:shadow-sky-300 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+  className="flex w-full items-center justify-center gap-2 rounded-full border border-sky-100/80 bg-white/80 px-4 py-3 font-semibold text-slate-700 shadow-md shadow-sky-100 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:shadow-sky-200 disabled:opacity-50"
 disabled={loading}
 >
  {/* sasasaa */}

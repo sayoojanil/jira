@@ -20,12 +20,19 @@ import LatestLinks from './pages/LatestLinks';
 // Shared Layout with Sidebar
 const AppLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-tr from-sky-50 via-white to-sky-100">
+    <div className="relative min-h-screen overflow-hidden bg-transparent transition-colors duration-300">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-10 top-12 h-56 w-56 rounded-full bg-sky-300/20 blur-3xl" />
+        <div className="absolute right-0 top-20 h-64 w-64 rounded-full bg-indigo-300/20 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-56 w-56 rounded-full bg-cyan-300/15 blur-3xl" />
+      </div>
       <Navbar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 px-3 pb-3 pt-2 md:px-6 md:pb-6 md:pt-4">
         <Sidebar />
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <Outlet />
+        <main className="ml-0 flex-1 overflow-y-auto p-2 md:ml-4 md:p-4 lg:p-6">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

@@ -462,14 +462,14 @@ const ProjectDetails: React.FC = () => {
 
   if (loading || !project) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sky-50/20">
+      <div className="min-h-screen flex items-center justify-center bg-sky-50/20 dark:bg-slate-950 transition-colors duration-300">
         <Loader2 className="animate-spin text-sky-500" size={40} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50/30 via-white to-sky-50/20">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50/30 via-white to-sky-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-8">
         {/* Back link */}
         <div>

@@ -106,7 +106,7 @@ const TeamMemberProfile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafc]">
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
         <Spin size="large" />
       </div>
     );
@@ -115,7 +115,7 @@ const TeamMemberProfile: React.FC = () => {
   const skillsList: string[] = profile?.skills || [];
 
   return (
-    <div className="min-h-screen bg-[#f4f2ee] pb-12">
+    <div className="min-h-screen bg-[#f4f2ee] dark:bg-slate-950 pb-12 transition-colors duration-300">
       <div className="max-w-3xl mx-auto px-4 pt-6">
         <button
           type="button"

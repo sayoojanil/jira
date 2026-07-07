@@ -10,8 +10,8 @@ const GlassCard: React.FC<GlassCardProps> = ({ children, className = '', onClick
   return (
     <div
       onClick={onClick}
-      className={`glass-card p-6 rounded-2xl transition-all duration-300 ${
-        onClick ? 'cursor-pointer hover:-translate-y-1' : ''
+      className={`glass-card p-7 sm:p-8 rounded-[28px] transition-all duration-500 ease-out ${
+        onClick ? 'cursor-pointer hover:-translate-y-2' : ''
       } ${className}`}
     >
       {children}

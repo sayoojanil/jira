@@ -252,9 +252,9 @@ const AdminDashboard: React.FC = () => {
             title="Copy Access Link"
             onClick={() => copyToClipboard(record.secureToken)}
           />
-          <Popconfirm
-            title="Are you sure you want to delete this project?"
-            onConfirm={() => handleDeleteProject(record._id)}
+            <Popconfirm
+              title="Are you sure you want to delete this project?"
+              onConfirm={() => handleDeleteProject(record._id)}
             okText="Yes"
             cancelText="No"
             okButtonProps={{ danger: true }}
@@ -281,6 +281,12 @@ const AdminDashboard: React.FC = () => {
         bg: 'from-sky-50 to-white border-sky-100',
       },
       {
+        title: 'Team Size',
+        value: stats.cards.totalTeam,
+        icon: <Users2 className="text-purple-600" size={24} />,
+        bg: 'from-purple-50 to-white border-purple-100',
+      },
+      {
         title: 'Active Projects',
         value: stats.cards.activeProjects,
         icon: <PlayCircle className="text-indigo-600" size={24} />,
@@ -304,34 +310,65 @@ const AdminDashboard: React.FC = () => {
         icon: <UserCheck className="text-teal-600" size={24} />,
         bg: 'from-teal-50 to-white border-teal-100',
       },
-      {
-        title: 'Team Size',
-        value: stats.cards.totalTeam,
-        icon: <Users2 className="text-purple-600" size={24} />,
-        bg: 'from-purple-50 to-white border-purple-100',
-      },
+  
     ];
 
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-        {cards.map((card, idx) => (
-          <GlassCard key={idx} className={`bg-gradient-to-tr ${card.bg} border p-5 flex flex-col justify-between`}>
-            <div className="flex justify-between items-start">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                {card.title}
-              </span>
+   return (
+  <>
+    {/* Mobile View */}
+    <GlassCard className="md:hidden p-5 mb-6">
+      <h3 className="text-lg font-bold text-slate-800 mb-4">
+        Workspace Overview
+      </h3>
+
+      <div className="space-y-3">
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between text-sm border-b border-slate-100 pb-2 last:border-0"
+          >
+            <div className="flex items-center gap-2">
               {card.icon}
+              <span className="font-medium text-slate-600">
+                {card.title} :
+              </span>
             </div>
-            <div className="mt-4 text-3xl font-extrabold text-slate-800">{card.value}</div>
-          </GlassCard>
+
+            <span className="font-bold text-slate-800">
+              {card.value}
+            </span>
+          </div>
         ))}
       </div>
-    );
+    </GlassCard>
+
+    {/* Desktop View */}
+    <div className="hidden md:grid grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+      {cards.map((card, idx) => (
+        <GlassCard
+          key={idx}
+          className={`bg-gradient-to-tr ${card.bg} border p-5 flex flex-col justify-between`}
+        >
+          <div className="flex justify-between items-start">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              {card.title}
+            </span>
+            {card.icon}
+          </div>
+
+          <div className="mt-4 text-3xl font-extrabold text-slate-800">
+            {card.value}
+          </div>
+        </GlassCard>
+      ))}
+    </div>
+  </>
+);
   };
 
- if (loading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafc]">
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
         <Spin size="large" />
       </div>
     );
