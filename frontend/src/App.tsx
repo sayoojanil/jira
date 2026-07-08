@@ -2,8 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
-import RoleGuard from './components/RoleGuard';
+import PerformanceToggle from './components/PerformanceToggle';
 import { useAppSelector } from './store';
+import RoleGuard from './components/RoleGuard';
 
 // Pages
 import Login from './pages/Login';
@@ -27,6 +28,7 @@ const AppLayout: React.FC = () => {
         <div className="absolute bottom-0 left-1/3 h-56 w-56 rounded-full bg-cyan-300/15 blur-3xl" />
       </div>
       <Navbar />
+      <PerformanceToggle />
       <div className="flex flex-1 px-3 pb-3 pt-2 md:px-6 md:pb-6 md:pt-4">
         <Sidebar />
         <main className="ml-0 flex-1 overflow-y-auto p-2 md:ml-4 md:p-4 lg:p-6">

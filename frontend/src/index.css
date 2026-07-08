@@ -37,10 +37,35 @@
     position: relative;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.72);
     box-shadow: 0 18px 50px -22px rgba(15, 23, 42, 0.18);
+  }
+
+  .glass-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.94);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    box-shadow: 0 22px 60px -24px rgba(14, 165, 233, 0.2);
+    animation: fadeUp 0.7s ease-out both;
+  }
+
+  /* Disable blur by default for performance */
+  .glass-panel, .glass-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Enable glass effect when .glass-enabled class is present */
+  .glass-enabled .glass-panel {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  .glass-enabled .glass-card {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   .glass-panel::before {
@@ -49,17 +74,6 @@
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.42), transparent 55%);
     pointer-events: none;
-  }
-
-  .glass-card {
-    position: relative;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.78);
-    box-shadow: 0 22px 60px -24px rgba(14, 165, 233, 0.2);
-    animation: fadeUp 0.7s ease-out both;
   }
 
   .glass-card::after {
@@ -143,6 +157,9 @@
 }
 
 /* Custom Scrollbar for sleek UI */
+html {
+  scroll-behavior: smooth;
+}
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
