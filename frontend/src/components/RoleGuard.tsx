@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../store';
 
 interface RoleGuardProps {
-  children: React.ReactNode;
+  children: React.ReactElement;
   allowedRoles?: ('admin' | 'client' | 'team_member')[];
 }
 

@@ -121,12 +121,12 @@ function handleClick() {
                   <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     Password
                   </label>
-                  <Link
+                  {/* <Link
                     to="/forgotpassword"
                     className="text-xs font-semibold text-sky-600 hover:text-indigo-600 transition"
                   >
                     Forgot Password?
-                  </Link>
+                  </Link> */}
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
