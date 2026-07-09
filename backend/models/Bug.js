@@ -8,8 +8,13 @@ const CommentSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true,
+    default: '',
   },
+  attachments: [
+    {
+      type: String,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

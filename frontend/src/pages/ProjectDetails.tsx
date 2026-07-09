@@ -90,6 +90,8 @@ const ProjectDetails: React.FC = () => {
   // Comment state
   const [bugComment, setBugComment] = useState('');
   const [bugStatusUpdate, setBugStatusUpdate] = useState('');
+  const [bugCommentFiles, setBugCommentFiles] = useState<FileList | null>(null);
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   const activeBugCount = bugs.filter(
     (bug) =>
@@ -399,21 +401,42 @@ const ProjectDetails: React.FC = () => {
 
   const handleBugComment = async () => {
     if (!activeBug) return;
+
+    const hasText = bugComment.trim().length > 0;
+    const hasAttachments = bugCommentFiles && bugCommentFiles.length > 0;
+
+    if (!hasText && !bugStatusUpdate && !hasAttachments) return;
+
     try {
-      const res = await API.put(`/bugs/${activeBug._id}`, {
-        comment: bugComment || undefined,
-        status: bugStatusUpdate || undefined,
-       
+      setSubmittingComment(true);
+      const formData = new FormData();
+
+      if (hasText) {
+        formData.append('comment', bugComment.trim());
+      }
+      if (bugStatusUpdate) {
+        formData.append('status', bugStatusUpdate);
+      }
+      if (hasAttachments) {
+        for (let i = 0; i < bugCommentFiles!.length; i++) {
+          formData.append('attachments', bugCommentFiles![i]);
+        }
+      }
+
+      const res = await API.put(`/bugs/${activeBug._id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       setActiveBug(res.data.data);
       setBugComment('');
       setBugStatusUpdate('');
+      setBugCommentFiles(null);
 
       message.success('Bug updated successfully');
-      // navigate('/');
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Failed to update bug');
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
@@ -1152,15 +1175,16 @@ const ProjectDetails: React.FC = () => {
 
             <div>
               <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1.5">
-                Screenshots
+                Screenshots / Files
               </label>
               <input
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
                 onChange={(e) => setBugScreenshots(e.target.files)}
                 className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
               />
+              <p className="text-[10px] text-slate-400 mt-1">Attach screenshots or files right away when reporting an issue.</p>
             </div>
 
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
@@ -1284,14 +1308,52 @@ const ProjectDetails: React.FC = () => {
                     activeBug.comments.map((c: any, idx: number) => (
                       <div key={idx} className="p-3 bg-sky-50/20 border border-sky-100/20 rounded-xl">
                         <div className="flex flex-wrap justify-between items-center text-[10px] text-slate-400 mb-1.5 gap-1">
-                          <span className="font-bold text-slate-600">
-                            {c.author.name} ({c.author.role})
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {c.author?.profilePic ? (
+                              <img
+                                src={getFileUrl(c.author.profilePic) || c.author.profilePic}
+                                alt={c.author.name}
+                                className="h-7 w-7 rounded-full object-cover border border-slate-200"
+                              />
+                            ) : (
+                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-100 text-slate-600 text-xs font-semibold">
+                                {c.author?.name?.charAt(0)?.toUpperCase() || 'U'}
+                              </div>
+                            )}
+                            <span className="font-bold text-slate-600">
+                              {c.author.name} ({c.author.role})
+                            </span>
+                          </div>
                           <span>{moment(c.createdAt).fromNow()}</span>
                         </div>
                         <p className="text-xs text-slate-600 whitespace-pre-line break-words">
                           {c.content}
                         </p>
+                        {c.attachments && c.attachments.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {c.attachments.map((attachment: string, attachmentIdx: number) => {
+                              const fileUrl = getFileUrl(attachment) || '';
+                              const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(fileUrl);
+
+                              return (
+                                <a
+                                  key={`${c._id || idx}-${attachmentIdx}`}
+                                  href={fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-semibold text-sky-700 hover:bg-sky-50"
+                                >
+                                  {isImage ? (
+                                    <img src={fileUrl} alt="Comment attachment" className="h-14 w-20 object-cover rounded-md mr-2" />
+                                  ) : (
+                                    <Paperclip size={12} className="mr-1.5" />
+                                  )}
+                                  <span>Attachment {attachmentIdx + 1}</span>
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     ))
                   ) : (
@@ -1339,14 +1401,28 @@ const ProjectDetails: React.FC = () => {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
+                      Attach Images / Files
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
+                      onChange={(e) => setBugCommentFiles(e.target.files)}
+                      className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Add screenshots or files to your comment update.</p>
+                  </div>
+
                   <div className="flex justify-end">
                     <Button
                       type="primary"
                       onClick={handleBugComment}
-                      disabled={!bugComment && !bugStatusUpdate}
+                      disabled={(!bugComment.trim() && !bugStatusUpdate && (!bugCommentFiles || bugCommentFiles.length === 0)) || submittingComment}
                       className="!bg-sky-600 hover:!bg-sky-700 rounded-full text-xs"
                     >
-                      Submit
+                      {submittingComment ? 'Uploading...' : 'Submit'}
                     </Button>
                   </div>
                 </div>

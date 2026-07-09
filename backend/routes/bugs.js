@@ -12,6 +12,6 @@ router.route('/project/:projectId')
   .get(getProjectBugs);
 
 router.route('/:id')
-  .put(updateBug);
+  .put(upload.array('attachments', 5), updateBug);
 
 module.exports = router;

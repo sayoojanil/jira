@@ -139,6 +139,14 @@ const updateBug = async (req, res) => {
     }
 
     const { status, priority, comment } = req.body;
+    const attachmentUrls = [];
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadResult = await uploadToCloudOrLocal(file);
+        attachmentUrls.push(uploadResult.url);
+      }
+    }
 
     let statusChanged = false;
     let oldStatus = bug.status;
@@ -151,10 +159,14 @@ const updateBug = async (req, res) => {
       bug.priority = priority;
     }
 
-    if (comment) {
+    const hasCommentText = typeof comment === 'string' && comment.trim().length > 0;
+    const hasAttachments = attachmentUrls.length > 0;
+
+    if (hasCommentText || hasAttachments) {
       bug.comments.push({
         author: req.user.id,
-        content: comment,
+        content: comment || '',
+        attachments: attachmentUrls,
       });
     }
 
@@ -180,7 +192,7 @@ const updateBug = async (req, res) => {
       } catch (err) {
         console.error('Failed to notify bug reporter:', err.message);
       }
-    } else if (comment) {
+    } else if (hasCommentText || hasAttachments) {
       await createActivity(
         bug.project,
         req.user.id,
@@ -191,11 +203,18 @@ const updateBug = async (req, res) => {
       // Notify reporter if comment by admin/team
       if (req.user.id !== bug.reporter._id.toString()) {
         try {
+          const messageText = hasCommentText
+            ? `Hi ${bug.reporter.name}, a new comment was added to your bug report '${bug.title}' by ${req.user.name}:\n\n"${comment}"`
+            : `Hi ${bug.reporter.name}, a new attachment was added to your bug report '${bug.title}' by ${req.user.name}.`;
+          const htmlText = hasCommentText
+            ? `<p>Hi <b>${bug.reporter.name}</b>,</p><p>A new comment was added to your bug report <b>${bug.title}</b> by <b>${req.user.name}</b>:</p><blockquote style="border-left: 3px solid #ccc; padding-left: 10px;">${comment}</blockquote>`
+            : `<p>Hi <b>${bug.reporter.name}</b>,</p><p>A new attachment was added to your bug report <b>${bug.title}</b> by <b>${req.user.name}</b>.</p>`;
+
           await sendEmail({
             to: bug.reporter.email,
-            subject: `New Comment on Bug: ${bug.title}`,
-            text: `Hi ${bug.reporter.name}, a new comment was added to your bug report '${bug.title}' by ${req.user.name}:\n\n"${comment}"`,
-            html: `<p>Hi <b>${bug.reporter.name}</b>,</p><p>A new comment was added to your bug report <b>${bug.title}</b> by <b>${req.user.name}</b>:</p><blockquote style="border-left: 3px solid #ccc; padding-left: 10px;">${comment}</blockquote>`,
+            subject: hasCommentText ? `New Comment on Bug: ${bug.title}` : `New Attachment on Bug: ${bug.title}`,
+            text: messageText,
+            html: htmlText,
           });
         } catch (err) {
           console.error('Failed to notify reporter of comment:', err.message);
