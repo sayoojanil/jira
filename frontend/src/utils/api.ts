@@ -35,4 +35,14 @@ API.interceptors.response.use(
   }
 );
 
+export const getFileUrl = (path?: string): string | undefined => {
+  if (!path) return undefined;
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  const backendBaseUrl = (import.meta.env.VITE_API_URL || 'https://jira-m1jo.onrender.com/api').replace(/\/api$/, '');
+  return `${backendBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
 export default API;
+

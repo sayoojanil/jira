@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import API from '../utils/api';
+import API, { getFileUrl } from '../utils/api';
 import GlassCard from '../components/GlassCard';
 import {
   FolderKanban,
@@ -415,7 +415,7 @@ const AdminDashboard: React.FC = () => {
                   <div className="h-12 w-12 rounded-full overflow-hidden bg-sky-100 flex items-center justify-center">
   {member.profilePic ? (
     <img
-      src={member.profilePic || 'No'}
+      src={getFileUrl(member.profilePic)}
       alt={member.name}
       className="h-full w-full object-cover"
     />
@@ -431,8 +431,8 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-[10px] text-slate-500 space-y-2 mb-4">
-                    <div>{member.position || 'No title set'}</div>
-                    <div>{member.profilePic ? 'Photo available' : 'No profile photo'}</div>
+                    <div>{member.position || 'Not set'}</div>
+                    <div>{member.phone}</div>
                   </div>
                   <button
                     type="button"

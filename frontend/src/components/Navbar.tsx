@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../store';
 import { logout } from '../store/authSlice';
 import { LogOut, User as UserIcon, Bell, Moon, Sun, Laptop } from 'lucide-react';
 import { Badge, Dropdown, MenuProps, message } from 'antd';
+import { getFileUrl } from '../utils/api';
 import { useTheme } from '../context/ThemeContext';
 
 const Navbar: React.FC = () => {
@@ -110,7 +111,7 @@ const Navbar: React.FC = () => {
             <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-sky-100">
               {user?.profilePic ? (
                 <img
-                  src={user.profilePic.startsWith('/uploads/') ? `https://jira-m1jo.onrender.com${user.profilePic}` : user.profilePic}
+                  src={getFileUrl(user.profilePic)}
                   alt={user?.name || 'Profile'}
                   className="block h-full w-full rounded-full object-cover"
                   draggable={false}

@@ -142,7 +142,7 @@ const Signup: React.FC = () => {
                   >
                     Client
                   </button>
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => setRole('team_member')}
                     className={`flex-1 py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
@@ -152,7 +152,7 @@ const Signup: React.FC = () => {
                     }`}
                   >
                     Team Member
-                  </button>
+                  </button> */}
                 </div>
               </div>
 

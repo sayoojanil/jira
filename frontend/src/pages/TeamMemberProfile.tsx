@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../store';
 import { authSuccess } from '../store/authSlice';
-import API from '../utils/api';
+import API, { getFileUrl } from '../utils/api';
 import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X } from 'lucide-react';
 import { Button, message, Tag, Input, Upload, Spin } from 'antd';
 
@@ -136,11 +136,7 @@ const TeamMemberProfile: React.FC = () => {
               <div className="w-full h-full rounded-full ring-4 ring-white bg-slate-100 overflow-hidden flex items-center justify-center text-3xl font-bold text-sky-700">
                 {profile?.profilePic ? (
                   <img
-                    src={
-                      profile.profilePic.startsWith('/uploads/')
-                        ? `https://jira-m1jo.onrender.com${profile.profilePic}`
-                        : profile.profilePic
-                    }
+                    src={getFileUrl(profile.profilePic)}
                     alt={profile.name}
                     className="h-full w-full object-cover"
                   />

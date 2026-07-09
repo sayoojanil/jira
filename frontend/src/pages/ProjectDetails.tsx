@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import API from '../utils/api';
+import API, { getFileUrl } from '../utils/api';
 import { getSocket } from '../utils/socket';
 import GlassCard from '../components/GlassCard';
 import {
@@ -766,7 +766,7 @@ const ProjectDetails: React.FC = () => {
                           className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50/50"
                         >
                           <Avatar
-                            src={client.profilePic ? `https://jira-m1jo.onrender.com${client.profilePic}` : undefined}
+                            src={getFileUrl(client.profilePic)}
                             className="h-8 w-8 md:h-10 md:w-10"
                           >
                             {client.name?.[0]?.toUpperCase()}
@@ -784,7 +784,7 @@ const ProjectDetails: React.FC = () => {
                         className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50/50"
                       >
                         <Avatar
-                          src={project.client.profilePic ? `https://jira-m1jo.onrender.com${project.client.profilePic}` : undefined}
+                          src={getFileUrl(project.client.profilePic)}
                           className="h-8 w-8 md:h-10 md:w-10"
                         >
                           {project.client.name?.[0]?.toUpperCase()}
@@ -814,7 +814,7 @@ const ProjectDetails: React.FC = () => {
                           onClick={() => navigate(`/team-member/${member._id}`)}
                         >
                           <Avatar
-                            src={member.profilePic ? `https://jira-m1jo.onrender.com${member.profilePic}` : undefined}
+                            src={getFileUrl(member.profilePic)}
                             className="h-8 w-8 md:h-10 md:w-10"
                           >
                             {member.name?.[0]?.toUpperCase()}
@@ -918,7 +918,7 @@ const ProjectDetails: React.FC = () => {
 
                         <div className="flex items-center gap-2 shrink-0">
                           <a
-                            href={file.url.startsWith('/uploads/') ? `https://jira-m1jo.onrender.com${file.url}` : file.url}
+                            href={getFileUrl(file.url)}
                             download
                             target="_blank"
                             rel="noopener noreferrer"
@@ -1231,9 +1231,7 @@ const ProjectDetails: React.FC = () => {
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-2">
                     {activeBug.screenshots.some((shot: string) => {
-                      const fileUrl = shot.startsWith("/uploads/")
-                        ? `https://jira-m1jo.onrender.com${shot}`
-                        : shot;
+                      const fileUrl = getFileUrl(shot) || '';
                       return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(fileUrl);
                     })
                       ? "Video"
@@ -1241,9 +1239,7 @@ const ProjectDetails: React.FC = () => {
                   </label>
                   <div className="grid grid-cols-1 gap-2.5">
                     {activeBug.screenshots.map((shot: string, idx: number) => {
-                      const fileUrl = shot.startsWith("/uploads/")
-                        ? `https://jira-m1jo.onrender.com${shot}`
-                        : shot;
+                      const fileUrl = getFileUrl(shot) || '';
                       const isVideo = /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(fileUrl);
 
                       return (
