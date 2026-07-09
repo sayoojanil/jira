@@ -64,6 +64,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedTeam, setSelectedTeam] = useState<string[]>([]);
   const [requirementsList, setRequirementsList] = useState<string[]>([]);
   const [reqInput, setReqInput] = useState('');
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
 
   const {
     register,
@@ -112,14 +113,19 @@ const AdminDashboard: React.FC = () => {
   const handleCreateProject = async (data: any) => {
     try {
       setActionLoading(true);
-      const response = await API.post('/projects', {
-        name: data.name,
-        // liveLink: data.liveLink,
-        description: data.description,
-        deadline: data.deadline,
-        requirements: requirementsList,
-        clientEmails: selectedClients,
-        assignedTeam: selectedTeam,
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('description', data.description);
+      formData.append('deadline', data.deadline);
+      formData.append('requirements', JSON.stringify(requirementsList));
+      formData.append('clientEmails', JSON.stringify(selectedClients));
+      formData.append('assignedTeam', JSON.stringify(selectedTeam));
+      if (bannerImageFile) {
+        formData.append('bannerImage', bannerImageFile);
+      }
+
+      await API.post('/projects', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       message.success('Project created successfully!');
@@ -128,6 +134,7 @@ const AdminDashboard: React.FC = () => {
       setRequirementsList([]);
       setSelectedClients([]);
       setSelectedTeam([]);
+      setBannerImageFile(null);
       loadData();
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Failed to create project.');
@@ -647,6 +654,21 @@ const AdminDashboard: React.FC = () => {
             />
             {errors.description && (
               <p className="text-xs text-rose-500 mt-1 font-medium">{errors.description.message as string}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">
+              Banner Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setBannerImageFile(e.target.files?.[0] || null)}
+              className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
+            />
+            {bannerImageFile && (
+              <p className="text-[10px] text-slate-400 mt-1">Selected: {bannerImageFile.name}</p>
             )}
           </div>
 

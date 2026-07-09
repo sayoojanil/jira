@@ -586,8 +586,18 @@ const ProjectDetails: React.FC = () => {
               </Space>
             </Modal>
           )}
-        <GlassCard className="border border-sky-100/40 relative overflow-hidden bg-gradient-to-tr from-white via-white to-sky-50/40 p-4 md:p-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start gap-4 lg:gap-6">
+        <GlassCard className="border border-sky-100/40 overflow-hidden bg-gradient-to-tr from-white via-white to-sky-50/40 p-0">
+          {project.bannerImage && (
+            <div className="relative h-40 md:h-56 w-full">
+              <img
+                src={getFileUrl(project.bannerImage)}
+                alt={`${project.name} banner`}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
+            </div>
+          )}
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-4 lg:gap-6 p-4 md:p-6">
             <div className="space-y-2 md:space-y-3 flex-1 w-full">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-800 flex-1 min-w-[200px]">

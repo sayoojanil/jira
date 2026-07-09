@@ -2,6 +2,21 @@ const Project = require('../models/Project');
 const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
 const crypto = require('crypto');
+const { uploadToCloudOrLocal } = require('../utils/cloudinary');
+
+const parseFormArray = (value) => {
+  if (Array.isArray(value)) return value;
+  if (!value) return [];
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      return value.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+  }
+  return [];
+};
 
 // Helper to log activities
 const createActivity = async (projectId, userId, action, details) => {
@@ -22,7 +37,10 @@ const createActivity = async (projectId, userId, action, details) => {
 // @access  Private/Admin
 const createProject = async (req, res) => {
   try {
-    const { name, description, requirements, deadline, clientEmail, clientEmails, assignedTeam } = req.body;
+    const { name, description, deadline, clientEmail, clientEmails, assignedTeam } = req.body;
+    const requirements = parseFormArray(req.body.requirements);
+    const resolvedClientEmails = parseFormArray(clientEmails || []);
+    const resolvedAssignedTeam = parseFormArray(assignedTeam || []);
 
     let resolvedClientIds = [];
 
@@ -35,8 +53,8 @@ const createProject = async (req, res) => {
       }
     }
 
-    if (clientEmails && Array.isArray(clientEmails)) {
-      for (const email of clientEmails) {
+    if (resolvedClientEmails.length > 0) {
+      for (const email of resolvedClientEmails) {
         if (!email) continue;
         const clientUser = await User.findOne({ email, role: 'client' });
         if (clientUser) {
@@ -50,15 +68,22 @@ const createProject = async (req, res) => {
     }
 
     const secureToken = crypto.randomBytes(24).toString('hex');
+    let bannerImageUrl = '';
+
+    if (req.file) {
+      const uploadResult = await uploadToCloudOrLocal(req.file);
+      bannerImageUrl = uploadResult.url;
+    }
 
     const project = await Project.create({
       name,
       description,
-      requirements: requirements || [],
+      bannerImage: bannerImageUrl,
+      requirements,
       deadline,
       client: resolvedClientIds.length > 0 ? resolvedClientIds[0] : null,
       assignedClients: resolvedClientIds,
-      assignedTeam: assignedTeam || [],
+      assignedTeam: resolvedAssignedTeam,
       secureToken,
       milestones: [],
     });
@@ -215,6 +240,10 @@ const updateProject = async (req, res) => {
 
     if (name) project.name = name;
     if (description) project.description = description;
+    if (req.file) {
+      const uploadResult = await uploadToCloudOrLocal(req.file);
+      project.bannerImage = uploadResult.url;
+    }
     if (requirements) project.requirements = requirements;
     if (deadline) project.deadline = deadline;
     if (progress !== undefined) project.progress = progress;

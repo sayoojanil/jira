@@ -24,6 +24,10 @@ const ProjectSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please add a description'],
     },
+    bannerImage: {
+      type: String,
+      default: '',
+    },
     requirements: [
       {
         type: String,
