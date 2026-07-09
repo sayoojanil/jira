@@ -22,7 +22,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['League Spartan', 'sans-serif'],
       },
     },
   },

@@ -470,7 +470,7 @@ const ProjectDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50/30 via-white to-sky-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-8">
+      <div className="p-3 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-8 pb-24 lg:pb-0">
         {/* Back link */}
         <div>
           <button
@@ -483,7 +483,7 @@ const ProjectDetails: React.FC = () => {
         </div>
 
         {/* Mobile Quick Actions */}
-        <div className="lg:hidden flex items-center justify-between gap-2">
+        <div className="lg:hidden flex flex-wrap items-center gap-2">
           <Badge count={activeBugCount} offset={[10, 0]}>
             <button
               onClick={() => setActiveTab('3')}
@@ -651,9 +651,9 @@ const ProjectDetails: React.FC = () => {
         <Tabs 
           activeKey={activeTab}
           onChange={setActiveTab}
-          className="bg-white/30 p-1 md:p-2 rounded-2xl"
+          className="bg-white/30 p-1 md:p-2 rounded-2xl overflow-hidden"
           size="small"
-          tabBarStyle={{ marginBottom: 0 }}
+          tabBarStyle={{ marginBottom: 0, overflowX: 'auto' }}
         >
           {/* Tab 1: Milestones & Specs */}
           <TabPane

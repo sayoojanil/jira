@@ -74,7 +74,7 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className="glass-panel sticky top-3 z-40 mx-3 mt-3 flex items-center justify-between rounded-[24px] border border-white/70 px-5 py-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.2)] sm:px-6">
+    <nav className="glass-panel sticky top-3 z-40 mx-3 mt-3 flex items-center justify-between rounded-full border border-white/70 px-5 py-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.2)] sm:px-6">
       {/* Brand logo */}
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
         <div>
@@ -91,23 +91,23 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-3">
         <button
           onClick={toggleTheme}
-          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
           title="Toggle Light/Dark Theme"
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
 
-        <Badge count={2} size="small" offset={[-2, 2]}>
+        {/* <Badge count={2} size="small" offset={[-2, 2]}> */}
           <button
             onClick={bellclick}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
           >
             <Bell size={18} />
           </button>
-        </Badge>
+        {/* </Badge> */}
 
         <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-          <div className="flex cursor-pointer items-center gap-3 rounded-2xl border border-sky-100/60 bg-white/60 p-1.5 pr-3 transition-all duration-300 hover:bg-sky-50">
+          <div className="flex cursor-pointer items-center gap-3 rounded-full border border-sky-100/60 bg-white/60 p-1.5 pr-3 transition-all duration-300 hover:bg-sky-50">
             <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-sky-100">
               {user?.profilePic ? (
                 <img

@@ -57,6 +57,8 @@ const TeamDashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
         <Spin size="large" />
+                              <span className="text-sm font-semibold text-slate-600">Loading team workspace...</span>
+
       </div>
     );
   }

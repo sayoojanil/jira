@@ -19,16 +19,14 @@ import {
 } from 'lucide-react';
 import {
   Modal,
-  Table,
   Tag,
   Progress,
   Select,
   Input,
-  DatePicker,
   Button,
   message,
   Popconfirm,
-  Spin
+  Spin,
   // Tabs,
 } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -176,98 +174,57 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const tableColumns = [
-    {
-      title: 'Project Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: string, record: any) => (
-        <span
-          className="font-semibold text-slate-800 hover:text-sky-600 cursor-pointer flex items-center gap-1.5"
-          onClick={() => window.open(`/project/${record._id}`, '_self')}
-        >
-          {text}
-          <ExternalLink size={12} className="text-slate-400" />
-        </span>
-      ),
-    },
-    {
-      title: 'Clients',
-      key: 'clients',
-      render: (_: any, record: any) => {
-        const clientsList = record.assignedClients && record.assignedClients.length > 0
-          ? record.assignedClients
-          : (record.client ? [record.client] : []);
+  const getBoardColumnKey = (status?: string) => {
+    switch (status) {
+      case 'Pending':
+      case 'On Hold':
+        return 'backlog';
+      case 'In Progress':
+        return 'progress';
+      case 'Checking':
+        return 'review';
+      case 'Completed':
+        return 'done';
+      default:
+        return 'selected';
+    }
+  };
 
-        if (clientsList.length === 0) {
-          return <span className="text-xs text-rose-500 font-medium">Unassigned</span>;
-        }
-
-        return (
-          <div className="flex flex-col gap-1.5">
-            {clientsList.map((client: any, idx: number) => (
-              <div key={client._id || idx} className="border-b border-slate-50 last:border-0 pb-0.5 last:pb-0">
-                <div className="text-xs font-semibold text-slate-700">{client.name}</div>
-                <div className="text-[10px] text-slate-400">{client.email}</div>
-              </div>
-            ))}
-          </div>
-        );
-      },
+  const kanbanColumns = [
+    {
+      key: 'backlog',
+      title: 'Backlog',
+      subtitle: 'Planned work',
+      accent: 'border-slate-200 bg-slate-50/80',
+      badge: 'bg-slate-100 text-slate-700',
     },
     {
-      title: 'Deadline',
-      dataIndex: 'deadline',
-      key: 'deadline',
-      render: (date: string) => (
-        <span className="text-xs font-medium text-slate-600">
-          {moment(date).format('MMM DD, YYYY')}
-        </span>
-      ),
+      key: 'selected',
+      title: 'Selected for Dev',
+      subtitle: 'Ready to start',
+      accent: 'border-sky-200 bg-sky-50/70',
+      badge: 'bg-sky-100 text-sky-700',
     },
     {
-      title: 'Progress',
-      dataIndex: 'progress',
       key: 'progress',
-      render: (progress: number) => (
-        <div className="w-28">
-          <Progress percent={progress} size="small" strokeColor="#0ea5e9" />
-        </div>
-      ),
+      title: 'In Progress',
+      subtitle: 'Currently building',
+      accent: 'border-amber-200 bg-amber-50/70',
+      badge: 'bg-amber-100 text-amber-700',
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => <Tag color={getStatusColor(status)}>{status}</Tag>,
+      key: 'review',
+      title: 'Review',
+      subtitle: 'Needs approval',
+      accent: 'border-violet-200 bg-violet-50/70',
+      badge: 'bg-violet-100 text-violet-700',
     },
     {
-      title: 'Action',
-      key: 'action',
-      render: (text: any, record: any) => (
-        <div className="flex gap-2">
-          <Button
-            type="text"
-            icon={<Copy size={16} className="text-sky-600" />}
-            title="Copy Access Link"
-            onClick={() => copyToClipboard(record.secureToken)}
-          />
-            <Popconfirm
-              title="Are you sure you want to delete this project?"
-              onConfirm={() => handleDeleteProject(record._id)}
-            okText="Yes"
-            cancelText="No"
-            okButtonProps={{ danger: true }}
-          >
-            <Button
-              type="text"
-              danger
-              icon={<Trash2 size={16} />}
-              title="Delete Project"
-            />
-          </Popconfirm>
-        </div>
-      ),
+      key: 'done',
+      title: 'Done',
+      subtitle: 'Completed work',
+      accent: 'border-emerald-200 bg-emerald-50/70',
+      badge: 'bg-emerald-100 text-emerald-700',
     },
   ];
 
@@ -509,12 +466,16 @@ const AdminDashboard: React.FC = () => {
         </GlassCard>
       </div>
 
-      {/* Projects List Table */}
+      {/* Jira-style Project Kanban */}
       <GlassCard>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <h3 className="text-base font-bold text-slate-800">All Portfolio Projects</h3>
-          <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
-            {/* Search */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+          <div>
+            <h3 className="text-base font-bold text-slate-800">Jira Project Board</h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Track delivery stages with a board that feels like Jira for every project.
+            </p>
+          </div>
+          <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
             <Input
               placeholder="Search projects..."
               value={searchTerm}
@@ -522,7 +483,6 @@ const AdminDashboard: React.FC = () => {
               className="w-full sm:w-60 rounded-xl"
               allowClear
             />
-            {/* Filter */}
             <Select
               defaultValue="All"
               onChange={(value) => setStatusFilter(value)}
@@ -539,15 +499,109 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Responsive Table */}
-        <div className="overflow-x-auto">
-          <Table
-            dataSource={filteredProjects}
-            columns={tableColumns}
-            rowKey="_id"
-            pagination={{ pageSize: 8, className: 'mt-6' }}
-            size="middle"
-          />
+        <div className="grid gap-4 xl:grid-cols-5">
+          {kanbanColumns.map((column) => {
+            const columnProjects = filteredProjects.filter(
+              (project) => getBoardColumnKey(project.status) === column.key
+            );
+
+            return (
+              <div key={column.key} className={`rounded-2xl border p-3 min-h-[420px] ${column.accent}`}>
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-800">{column.title}</h4>
+                    <p className="text-[11px] text-slate-500">{column.subtitle}</p>
+                  </div>
+                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${column.badge}`}>
+                    {columnProjects.length}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {columnProjects.length > 0 ? (
+                    columnProjects.map((project) => {
+                      const clientsList = project.assignedClients && project.assignedClients.length > 0
+                        ? project.assignedClients
+                        : (project.client ? [project.client] : []);
+
+                      return (
+                        <div
+                          key={project._id}
+                          onClick={() => window.open(`/project/${project._id}`, '_self')}
+                          className="cursor-pointer rounded-2xl border border-white/70 bg-white/90 p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                        >
+                          <div className="mb-2 flex items-start justify-between gap-2">
+                            <div>
+                              <div className="text-sm font-semibold text-slate-800 line-clamp-2">
+                                {project.name}
+                              </div>
+                              <div className="mt-1 text-[11px] text-slate-400">
+                                {moment(project.deadline).format('MMM DD, YYYY')}
+                              </div>
+                            </div>
+                            <Tag color={getStatusColor(project.status)}>{project.status}</Tag>
+                          </div>
+
+                          <p className="mb-3 text-xs leading-5 text-slate-500 line-clamp-3">
+                            {project.description || 'No description provided yet.'}
+                          </p>
+
+                          <div className="mb-3">
+                            <div className="mb-1 flex items-center justify-between text-[11px] text-slate-500">
+                              <span>Progress</span>
+                              <span>{project.progress || 0}%</span>
+                            </div>
+                            <Progress percent={project.progress || 0} size="small" strokeColor="#0ea5e9" />
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[11px] text-slate-500">
+                              {clientsList.length > 0 ? `${clientsList.length} client${clientsList.length > 1 ? 's' : ''}` : 'Unassigned'}
+                            </div>
+                            <div className="flex gap-1.5">
+                              <Button
+                                type="text"
+                                size="small"
+                                icon={<Copy size={14} className="text-sky-600" />}
+                                title="Copy Access Link"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  copyToClipboard(project.secureToken);
+                                }}
+                              />
+                              <Popconfirm
+                                title="Are you sure you want to delete this project?"
+                                onConfirm={(event) => {
+                                  event?.stopPropagation();
+                                  handleDeleteProject(project._id);
+                                }}
+                                okText="Yes"
+                                cancelText="No"
+                                okButtonProps={{ danger: true }}
+                              >
+                                <Button
+                                  type="text"
+                                  size="small"
+                                  danger
+                                  icon={<Trash2 size={14} />}
+                                  title="Delete Project"
+                                  onClick={(event) => event.stopPropagation()}
+                                />
+                              </Popconfirm>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-slate-200 bg-white/60 p-4 text-center text-xs text-slate-400">
+                      No projects in this lane.
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </GlassCard>
 

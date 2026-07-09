@@ -4,8 +4,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../store';
 import { authSuccess } from '../store/authSlice';
 import API, { getFileUrl } from '../utils/api';
-import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X } from 'lucide-react';
-import { Button, message, Tag, Input, Upload, Spin } from 'antd';
+import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X, MoveLeft, MoveRight, MoveUp, MoveDown, ZoomIn, ZoomOut } from 'lucide-react';
+import { Button, message, Tag, Input, Upload, Spin, Modal } from 'antd';
 
 const TeamMemberProfile: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -15,8 +15,15 @@ const TeamMemberProfile: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [avatarPreviewOpen, setAvatarPreviewOpen] = useState(false);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const [avatarSource, setAvatarSource] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [cropOffsetX, setCropOffsetX] = useState(0);
+  const [cropOffsetY, setCropOffsetY] = useState(0);
+  const [cropScale, setCropScale] = useState(1);
 
   const isOwnProfile = !id || id === user?._id;
 
@@ -59,6 +66,133 @@ const TeamMemberProfile: React.FC = () => {
     fetchProfile();
   }, [id]);
 
+  const resetAvatarCrop = () => {
+    setAvatarModalOpen(false);
+    setAvatarSource(null);
+    setAvatarFile(null);
+    setCropOffsetX(0);
+    setCropOffsetY(0);
+    setCropScale(1);
+  };
+
+  const openAvatarPreview = () => {
+    if (profile?.profilePic) {
+      setAvatarPreviewUrl(getFileUrl(profile.profilePic) || null);
+      setAvatarPreviewOpen(true);
+    }
+  };
+
+  const handleAvatarSelection = (selectedFile: File) => {
+    if (!selectedFile.type.startsWith('image/')) {
+      message.error('Please select an image file.');
+      return false;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatarSource(reader.result as string);
+      setAvatarFile(selectedFile);
+      setCropOffsetX(0);
+      setCropOffsetY(0);
+      setCropScale(1);
+      setAvatarModalOpen(true);
+    };
+    reader.readAsDataURL(selectedFile);
+    return false;
+  };
+
+  const handleMoveCrop = (dx: number, dy: number) => {
+    setCropOffsetX((prev) => prev + dx);
+    setCropOffsetY((prev) => prev + dy);
+  };
+
+  const handleZoomChange = (delta: number) => {
+    setCropScale((prev) => Math.min(2.5, Math.max(1, prev + delta)));
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile || !avatarSource) return;
+
+    try {
+      setUploading(true);
+      const img = new Image();
+      img.src = avatarSource;
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Image could not be loaded.'));
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 320;
+      canvas.height = 320;
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        throw new Error('Unable to create image preview.');
+      }
+
+      const canvasSize = 320;
+      const cropSize = 320;
+      
+      // Calculate the scale to fit the image in the crop area
+      const fitScale = Math.max(cropSize / img.naturalWidth, cropSize / img.naturalHeight);
+      const effectiveScale = fitScale * cropScale;
+      
+      // Calculate the size of the source image to crop
+      const sourceWidth = cropSize / effectiveScale;
+      const sourceHeight = cropSize / effectiveScale;
+      
+      // Calculate the center of the source image
+      const sourceCenterX = img.naturalWidth / 2;
+      const sourceCenterY = img.naturalHeight / 2;
+      
+      // Apply offset to the center (in source image coordinates)
+      const offsetX = cropOffsetX / effectiveScale;
+      const offsetY = cropOffsetY / effectiveScale;
+      
+      // Calculate the crop rectangle (centered on source center + offset)
+      let sourceX = sourceCenterX - sourceWidth / 2 + offsetX;
+      let sourceY = sourceCenterY - sourceHeight / 2 + offsetY;
+      
+      // Clamp to image bounds
+      sourceX = Math.max(0, Math.min(sourceX, img.naturalWidth - sourceWidth));
+      sourceY = Math.max(0, Math.min(sourceY, img.naturalHeight - sourceHeight));
+
+      // Fill with white background
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvasSize, canvasSize);
+
+      // Create circular clipping path
+      context.save();
+      context.beginPath();
+      context.arc(canvasSize / 2, canvasSize / 2, canvasSize / 2, 0, Math.PI * 2);
+      context.closePath();
+      context.clip();
+      
+      // Draw the image centered in the circle
+      context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvasSize, canvasSize);
+      context.restore();
+
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg'));
+      if (!blob) {
+        throw new Error('Unable to prepare the cropped image.');
+      }
+
+      const formData = new FormData();
+      formData.append('profilePic', blob, avatarFile.name || 'profile.jpg');
+
+      const response = await API.put('/auth/me', formData);
+      setProfile((prev: any) => (prev ? { ...prev, profilePic: response.data.data.profilePic } : response.data.data));
+      dispatch(authSuccess({ user: response.data.data, token: localStorage.getItem('token') || '' }));
+      message.success('Profile photo updated successfully.');
+      resetAvatarCrop();
+    } catch (err: any) {
+      message.error(err.response?.data?.message || err.message || 'Profile photo upload failed.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onSubmit = async (data: any) => {
     if (!isOwnProfile) return;
     try {
@@ -69,9 +203,6 @@ const TeamMemberProfile: React.FC = () => {
       formData.append('position', data.position);
       formData.append('phone', data.phone);
       formData.append('skills', data.skills || '');
-      if (file) {
-        formData.append('profilePic', file);
-      }
       const response = await API.put('/auth/me', formData);
       setProfile(response.data.data);
       reset({
@@ -83,7 +214,6 @@ const TeamMemberProfile: React.FC = () => {
       });
       dispatch(authSuccess({ user: response.data.data, token: localStorage.getItem('token') || '' }));
       message.success('Profile updated successfully.');
-      setFile(null);
       setIsEditing(false);
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Profile update failed.');
@@ -100,7 +230,6 @@ const TeamMemberProfile: React.FC = () => {
       phone: profile?.phone || '',
       skills: profile?.skills ? profile.skills.join(', ') : '',
     });
-    setFile(null);
     setIsEditing(false);
   };
 
@@ -108,6 +237,8 @@ const TeamMemberProfile: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
         <Spin size="large" />
+                              <span className="text-sm font-semibold text-slate-600">Loading profile...</span>
+
       </div>
     );
   }
@@ -128,29 +259,29 @@ const TeamMemberProfile: React.FC = () => {
         {/* Profile card */}
         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
           {/* Cover banner */}
-          <div className="h-32 sm:h-20 " />
+          <div className="h-32 sm:h-20 bg-gradient-to-r from-sky-400 to-sky-600" />
 
           {/* Avatar + header */}
           <div className="px-5 sm:px-8 pb-5 relative">
             <div className="relative -mt-14 sm:-mt-16 w-28 h-28 sm:w-32 sm:h-32">
-              <div className="w-full h-full rounded-full ring-4 ring-white bg-slate-100 overflow-hidden flex items-center justify-center text-3xl font-bold text-sky-700">
+              <button
+                type="button"
+                onClick={profile?.profilePic ? openAvatarPreview : undefined}
+                className={`w-full h-full rounded-full ring-4 ring-white bg-slate-100 overflow-hidden flex items-center justify-center text-3xl font-bold text-sky-700 ${profile?.profilePic ? 'cursor-zoom-in' : 'cursor-default'}`}
+              >
                 {profile?.profilePic ? (
                   <img
                     src={getFileUrl(profile.profilePic)}
                     alt={profile.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover object-center"
                   />
                 ) : (
                   profile.name?.[0]?.toUpperCase() || 'T'
                 )}
-              </div>
+              </button>
               {isOwnProfile && (
                 <Upload
-                  beforeUpload={(f) => {
-                    setFile(f as File);
-                    return false;
-                  }}
-                  onRemove={() => setFile(null)}
+                  beforeUpload={(file) => handleAvatarSelection(file as File)}
                   accept="image/*"
                   maxCount={1}
                   showUploadList={false}
@@ -192,7 +323,94 @@ const TeamMemberProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Edit form (LinkedIn-style edit panel) */}
+        {/* Avatar Preview Modal */}
+        <Modal 
+          open={avatarPreviewOpen} 
+          onCancel={() => setAvatarPreviewOpen(false)} 
+          footer={null} 
+          centered
+          bodyStyle={{ padding: '20px' }}
+        >
+          <div className="flex items-center justify-center">
+            {avatarPreviewUrl && (
+              <img 
+                src={avatarPreviewUrl} 
+                alt={profile?.name || 'Profile photo'} 
+                className="max-h-[60vh] max-w-[60vh] rounded-full object-contain shadow-lg"
+              />
+            )}
+          </div>
+        </Modal>
+
+        {/* Crop Modal */}
+        <Modal 
+          open={avatarModalOpen} 
+          onCancel={resetAvatarCrop} 
+          footer={null} 
+          title="Crop profile photo" 
+          centered
+          width={400}
+        >
+          <div className="space-y-4">
+            <div className="mx-auto flex h-72 w-72 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 relative">
+              {avatarSource && (
+                <>
+                  <img
+                    src={avatarSource}
+                    alt="Avatar preview"
+                    className="w-full h-full object-cover"
+                    style={{ 
+                      transform: `scale(${cropScale}) translate(${cropOffsetX / cropScale}px, ${cropOffsetY / cropScale}px)`,
+                      transformOrigin: 'center center'
+                    }}
+                  />
+                  {/* Circle crop indicator overlay */}
+                  <div 
+                    className="absolute inset-0 rounded-full border-4 border-sky-500 border-opacity-70 pointer-events-none"
+                    style={{ 
+                      width: '100%', 
+                      height: '100%',
+                      top: 0,
+                      left: 0,
+                    }}
+                  />
+                  {/* Semi-transparent overlay outside the circle */}
+                  <div 
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background: 'radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.4) 50.5%)',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  />
+                </>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Button icon={<ZoomOut size={14} />} onClick={() => handleZoomChange(-0.1)} />
+                <span className="text-sm text-slate-600 min-w-[40px] text-center">{cropScale.toFixed(1)}x</span>
+                <Button icon={<ZoomIn size={14} />} onClick={() => handleZoomChange(0.1)} />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button icon={<MoveLeft size={14} />} onClick={() => handleMoveCrop(-10, 0)} />
+                <Button icon={<MoveRight size={14} />} onClick={() => handleMoveCrop(10, 0)} />
+                <Button icon={<MoveUp size={14} />} onClick={() => handleMoveCrop(0, -10)} />
+                <Button icon={<MoveDown size={14} />} onClick={() => handleMoveCrop(0, 10)} />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <Button onClick={resetAvatarCrop}>Cancel</Button>
+              <Button type="primary" loading={uploading} onClick={handleAvatarUpload} className="!bg-sky-700">
+                Upload photo
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Edit form */}
         {isOwnProfile && isEditing && (
           <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-slate-200 mt-3 p-5 sm:p-8 space-y-5">
             <div className="flex items-center justify-between">

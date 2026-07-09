@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 const PerformanceToggle: React.FC = () => {
   const [enabled, setEnabled] = useState<boolean>(false);
 
-  // Apply or remove the class on mount and when the state changes  
+  // Apply or remove the class on mount and when the state changes
   useEffect(() => {
     const root = document.documentElement;
     if (enabled) {
@@ -15,7 +15,7 @@ const PerformanceToggle: React.FC = () => {
 
   const toggle = () => setEnabled((prev) => !prev);
 
-
+  return null;
 };
 
 export default PerformanceToggle;
