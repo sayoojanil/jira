@@ -138,7 +138,7 @@ const TeamMemberProfile: React.FC = () => {
                   <img
                     src={
                       profile.profilePic.startsWith('/uploads/')
-                        ? `http://localhost:5000${profile.profilePic}`
+                        ? `https://jira-m1jo.onrender.com${profile.profilePic}`
                         : profile.profilePic
                     }
                     alt={profile.name}

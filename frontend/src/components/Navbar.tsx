@@ -110,7 +110,7 @@ const Navbar: React.FC = () => {
             <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-sky-100">
               {user?.profilePic ? (
                 <img
-                  src={user.profilePic.startsWith('/uploads/') ? `http://localhost:5000${user.profilePic}` : user.profilePic}
+                  src={user.profilePic.startsWith('/uploads/') ? `https://jira-m1jo.onrender.com${user.profilePic}` : user.profilePic}
                   alt={user?.name || 'Profile'}
                   className="block h-full w-full rounded-full object-cover"
                   draggable={false}
