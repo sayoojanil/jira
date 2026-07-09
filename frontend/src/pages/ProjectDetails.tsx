@@ -411,7 +411,7 @@ const ProjectDetails: React.FC = () => {
       setBugStatusUpdate('');
 
       message.success('Bug updated successfully');
-      navigate('/');
+      // navigate('/');
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Failed to update bug');
     }
