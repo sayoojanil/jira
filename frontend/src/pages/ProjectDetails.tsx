@@ -900,7 +900,9 @@ const ProjectDetails: React.FC = () => {
                     )}
                   </div>
                   <br></br>
+                  <div className="flex justify-center border-t border-sky-100 pt-4">
                   <a href='/team' className='text-blue-600 cursor-pointer hover:text-blue-800' >View all members</a>
+                  </div>
                 </GlassCard>
               </div>
             </div>
