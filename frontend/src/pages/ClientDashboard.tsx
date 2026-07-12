@@ -87,10 +87,10 @@ const ClientDashboard: React.FC = () => {
             >
               <div>
                 <div className="flex justify-between items-start gap-4">
-                  <h3 className="font-bold text-lg text-slate-800 truncate">{p.name}</h3>
-                  <Tag color={getStatusColor(p.status)} className="flex items-center gap-1">
+                  <h3 className="font-bold text-lg text-black truncate">{p.name}</h3>
+                  <Tag color={getStatusColor(p.status)} className="flex items-center gap-1 ">
                     {getStatusIcon(p.status)}
-                    <span>{p.status}</span>
+                    <span >{p.status}</span>
                   </Tag>
                 </div>
                 <p className="text-slate-500 text-xs mt-2 line-clamp-2">{p.description}</p>

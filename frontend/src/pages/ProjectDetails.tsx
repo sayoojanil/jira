@@ -602,15 +602,18 @@ const ProjectDetails: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-800 flex-1 min-w-[200px]">
                   {project.name}
-                </h1>
-                <Tag color={getStatusColor(project.status)} className="px-2 py-0.5 rounded-md text-[10px] md:text-xs font-semibold">
+                  <Tag color={getStatusColor(project.status)} className="px-2 py-0.5 ml-4 rounded-md text-[10px] md:text-xs font-semibold">
                   {project.status}
                 </Tag>
+                </h1>
+                 
+               
               </div>
               <p className="text-slate-500 text-xs md:text-sm max-w-3xl leading-relaxed">
                 {project.description}
               </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] md:text-xs text-slate-400 font-medium">
+              <br/>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] md:text-xs text-slate-400 font-medium">
                 <span className="flex items-center gap-1.5">
                   <Calendar size={14} className="text-slate-400" />
                   <span>Deadline: {moment(project.deadline).format('MMM DD, YYYY')}</span>
@@ -652,13 +655,44 @@ const ProjectDetails: React.FC = () => {
                   value={project.status}
                   onChange={handleStatusChange}
                   className="w-full lg:w-44"
-                  size="small"
+                  size="large"
                 >
-                  <Option value="Pending">🟢Pending</Option>
-                  <Option value="In Progress">In Progress</Option>
-                  <Option value="Checking">Checking</Option>
-                  <Option value="On Hold">On Hold</Option>
-                  <Option value="Completed">Completed</Option>
+              
+
+<Option value="Pending">
+  <span className="inline-flex items-center gap-2">
+    <span className="h-2.5 w-2.5 rounded-full bg-yellow-500"></span>
+    <span>Pending</span>
+  </span>
+</Option>
+
+<Option value="In Progress">
+  <span className="inline-flex items-center gap-2">
+    <span className="h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+    <span>In Progress</span>
+  </span>
+</Option>
+
+<Option value="Checking">
+  <span className="inline-flex items-center gap-2">
+    <span className="h-2.5 w-2.5 rounded-full bg-orange-500"></span>
+    <span>Checking</span>
+  </span>
+</Option>
+
+<Option value="On Hold">
+  <span className="inline-flex items-center gap-2">
+    <span className="h-2.5 w-2.5 rounded-full bg-red-500"></span>
+    <span>On Hold</span>
+  </span>
+</Option>
+
+<Option value="Completed">
+  <span className="inline-flex items-center gap-2">
+    <span className="h-2.5 w-2.5 rounded-full bg-green-500"></span>
+    <span>Completed</span>
+  </span>
+</Option>
                 </Select>
               </div>
             )}
@@ -730,12 +764,12 @@ const ProjectDetails: React.FC = () => {
                           <div className="flex items-start gap-3 min-w-0 flex-1">
                             <button
                               onClick={() => toggleMilestone(m._id, !m.isCompleted)}
-                              className="mt-0.5 text-sky-500 hover:text-indigo-600 shrink-0"
+                              className="mt-0.5 text-sky-500 hover:text-indigo-600 shrink-0 rounded-full"
                             >
                               {m.isCompleted ? (
-                                <CheckCircle2 size={18} className="text-emerald-500" />
+                                <CheckCircle2 size={18} className="text-white bg-green-500 rounded-full" />
                               ) : (
-                                <div className="h-[18px] w-[18px] border-2 border-sky-200 rounded-md hover:border-sky-500" />
+                                <div className="h-[18px] w-[18px] border-2 rounded-full border-sky-200 hover:border-sky-500" />
                               )}
                             </button>
                             <div className="min-w-0 flex-1">

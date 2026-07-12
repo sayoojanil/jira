@@ -224,7 +224,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-3">
         <button
           onClick={toggleTheme}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-black transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
           title="Toggle Light/Dark Theme"
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
@@ -242,7 +242,7 @@ const Navbar: React.FC = () => {
             }}
           >
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
+              className="flex h-10 w-10 items-center font-bold justify-center rounded-full border border-sky-100/60 bg-white/60 text-black transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
               aria-label="Notifications"
             >
               <Bell size={18} />

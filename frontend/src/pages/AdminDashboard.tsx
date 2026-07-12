@@ -392,6 +392,8 @@ const AdminDashboard: React.FC = () => {
                     <div>
                       <div className="font-semibold text-slate-800">{member.name}</div>
                       <div className="text-[10px] text-slate-400 font-bold">{member.email}</div>
+                      {/* <div className="text-[10px] text-slate-400 font-bold">{member.email}</div> */}
+  
                     </div>
                   </div>
                   <div className="text-[10px] text-slate-500 space-y-2 mb-4">

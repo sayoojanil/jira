@@ -368,3 +368,14 @@ html {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 163, 175, 0.7);
 }
+
+/* Global font override */
+*,
+*::before,
+*::after {
+  font-family: 'League Spartan', sans-serif !important;
+}
+
+section {
+  font-family: 'League Spartan', sans-serif;
+}

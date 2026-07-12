@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../utils/api';
+import API, { getFileUrl } from '../utils/api';
 import GlassCard from '../components/GlassCard';
-import { FolderKanban, PlayCircle, Clock, CheckCircle2, ChevronRight, HelpCircle, Loader2 } from 'lucide-react';
-import { Progress, Tag, Alert,Spin } from 'antd';
+import { FolderKanban, PlayCircle, Clock, CheckCircle2, ChevronRight, HelpCircle,Calendar, Loader2 } from 'lucide-react';
+import { Progress, Tag, Alert, Spin, Avatar } from 'antd';
 import moment from 'moment';
 
 const TeamDashboard: React.FC = () => {
@@ -83,12 +83,16 @@ const TeamDashboard: React.FC = () => {
               <div>
                 <div className="flex justify-between items-start gap-4">
                   <h3 className="font-bold text-lg text-slate-800 truncate">{p.name}</h3>
-                  <Tag color={getStatusColor(p.status)} className="flex items-center gap-1">
-                    {getStatusIcon(p.status)}
-                    <span>{p.status}</span>
-                  </Tag>
+                 <Tag
+  color={getStatusColor(p.status)}
+  className="flex items-center gap-1 border-0"
+>
+  {getStatusIcon(p.status)}
+  <span>{p.status}</span>
+</Tag>
                 </div>
                 <p className="text-slate-500 text-xs mt-2 line-clamp-2">{p.description}</p>
+             
               </div>
 
               <div className="mt-6 pt-4 border-t border-sky-100/20 space-y-4">
@@ -100,13 +104,31 @@ const TeamDashboard: React.FC = () => {
                   <Progress percent={p.progress} showInfo={false} strokeColor="#0ea5e9" size="small" />
                 </div>
 
-                <div className="flex justify-between items-center text-[10px] text-slate-400">
-                  <span>Deadline: {moment(p.deadline).format('MMM DD, YYYY')}</span>
-                  <span className="flex items-center gap-0.5 text-sky-600 font-semibold">
-                    <span>View Workspace</span>
-                    <ChevronRight size={12} />
-                  </span>
-                </div>
+              <div className="flex justify-between items-center text-[10px] text-slate-400">
+  <span className="flex items-center gap-1">
+    <Calendar size={11} className="text-slate-700" />
+    <span className='text-slate-600 font-semibold'>Deadline: {moment(p.deadline).format('MMMM DD, YYYY')}</span>
+    
+  </span>
+   <div className="flex -space-x-2 mt-2">
+                {p.assignedTeam?.length > 0 && p.assignedTeam.map((member: any) => (
+                  <Avatar
+                    key={member._id}
+                    src={member.profilePic ? getFileUrl(member.profilePic) : undefined}
+                    className="border-2 border-white"
+                  >
+                    {member.name?.[0]?.toUpperCase()}
+                  </Avatar>
+                ))}
+              </div>
+
+  
+
+  <span className="flex items-center gap-0.5 text-sky-600 text-sm font-semibold">
+    <span>View Workspace</span>
+    <ChevronRight size={12} />
+  </span>
+</div>
               </div>
             </GlassCard>
           ))}
