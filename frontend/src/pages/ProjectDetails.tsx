@@ -892,12 +892,15 @@ const ProjectDetails: React.FC = () => {
                             </div>
                             <div className="text-[10px] text-slate-400 truncate">{member.email}</div>
                           </div>
+                          
                         </div>
                       ))
                     ) : (
                       <p className="text-xs text-slate-400 font-medium">No team assigned.</p>
                     )}
                   </div>
+                  <br></br>
+                  <a href='/team' className='text-blue-600 cursor-pointer hover:text-blue-800' >View all members</a>
                 </GlassCard>
               </div>
             </div>
