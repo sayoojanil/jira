@@ -706,7 +706,7 @@ const ProjectDetails: React.FC = () => {
             </div>
             <Progress 
               percent={project.progress} 
-              strokeColor="#0ea5e9" 
+              strokeColor="#0e62e9ff" 
               size="small" 
               showInfo={false}
               strokeWidth={6}
@@ -1028,7 +1028,7 @@ const ProjectDetails: React.FC = () => {
                 <BugIcon size={14} className="md:w-4 md:h-4" />
                 <span className="hidden xs:inline">Bugs</span>
                 {activeBugCount > 0 ? (
-                  <Badge count={activeBugCount} className="bg-red-500" />
+                  <Badge count={activeBugCount} className="bg-red-500 rounded-full" />
                 ) : (
                   <Badge dot className="bg-green-500" />
                 )}

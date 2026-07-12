@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../store';
+
 import API, { getFileUrl } from '../utils/api';
 import GlassCard from '../components/GlassCard';
 import { FolderKanban, PlayCircle, Clock, CheckCircle2, ChevronRight, HelpCircle,Calendar, Loader2 } from 'lucide-react';
@@ -9,6 +11,8 @@ import moment from 'moment';
 const TeamDashboard: React.FC = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAppSelector((state) => state.auth);
+
   const navigate = useNavigate();
 
   const loadProjects = async () => {
@@ -67,6 +71,9 @@ const TeamDashboard: React.FC = () => {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-800">Team Workspace</h1>
+        
+        <h1 className="text-xl mb-3 mt-1 font-bold text-slate-500">Welcome back, { user?.name  || 'Member'}</h1>
+
         <p className="text-slate-500 text-sm mt-1">
           Track project milestones, coordinate file deliveries and resolve client bug logs.
         </p>
