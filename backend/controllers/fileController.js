@@ -93,7 +93,18 @@ const uploadFile = async (req, res) => {
 
     const populatedFile = await File.findById(fileDoc._id).populate('uploader', 'name email role');
 
+    const notification = {
+      id: `${populatedFile._id}-file`,
+      type: 'file',
+      title: 'New file uploaded',
+      message: `${req.user.name} uploaded "${uploadResult.name}"`,
+      projectId: projectId.toString(),
+      projectName: project.name,
+      createdAt: new Date().toISOString(),
+    };
+
     if (global.io) {
+      global.io.emit('newNotification', notification);
       global.io.to(projectId.toString()).emit('fileUploaded', populatedFile);
     }
 

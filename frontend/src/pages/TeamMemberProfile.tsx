@@ -246,7 +246,7 @@ const TeamMemberProfile: React.FC = () => {
   const skillsList: string[] = profile?.skills || [];
 
   return (
-    <div className="min-h-screen bg-[#f4f2ee] dark:bg-slate-950 pb-12 transition-colors duration-300">
+    <div className="min-h-screen  dark:bg-slate-950 pb-12 transition-colors duration-300">
       <div className="max-w-3xl mx-auto px-4 pt-6">
         <button
           type="button"
@@ -259,12 +259,11 @@ const TeamMemberProfile: React.FC = () => {
         {/* Profile card */}
         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
           {/* Cover banner */}
-          <div className="h-32 sm:h-20 bg-gradient-to-r from-sky-400 to-sky-600" />
+          <div className="h-24 item-center sm:h-20" />
 
           {/* Avatar + header */}
           <div className="px-5 sm:px-8 pb-5 relative">
-            <div className="relative -mt-14 sm:-mt-16 w-28 h-28 sm:w-32 sm:h-32">
-              <button
+<div className="relative -mt-14 sm:-mt-16 w-28 h-28 sm:w-32 sm:h-32 mx-auto sm:mx-0">              <button
                 type="button"
                 onClick={profile?.profilePic ? openAvatarPreview : undefined}
                 className={`w-full h-full rounded-full ring-4 ring-white bg-slate-100 overflow-hidden flex items-center justify-center text-3xl font-bold text-sky-700 ${profile?.profilePic ? 'cursor-zoom-in' : 'cursor-default'}`}
@@ -314,7 +313,7 @@ const TeamMemberProfile: React.FC = () => {
                   icon={<Pencil size={14} />}
                   onClick={() => setIsEditing(true)}
                   shape="round"
-                  className="!flex !items-center !gap-1.5 !border-sky-700 !text-sky-700 !font-semibold shrink-0"
+                  className="!flex !items-center !gap-1.5 !border-sky-700 !text-sky-700 !font-semibold shrink-0 text-xs"
                 >
                   Edit profile
                 </Button>

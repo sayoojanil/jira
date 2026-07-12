@@ -157,3 +157,22 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+
+// import SiteDown from "./components/404page";
+
+// function App() {
+//   const siteDisabled = true;
+
+//   if (siteDisabled) {
+//     return <SiteDown />;
+//   }
+
+//   return (
+//     <>
+//       {/* Your normal website */}
+//     </>
+//   );
+// }
+
+// export default App;

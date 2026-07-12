@@ -654,7 +654,7 @@ const ProjectDetails: React.FC = () => {
                   className="w-full lg:w-44"
                   size="small"
                 >
-                  <Option value="Pending">Pending</Option>
+                  <Option value="Pending">🟢Pending</Option>
                   <Option value="In Progress">In Progress</Option>
                   <Option value="Checking">Checking</Option>
                   <Option value="On Hold">On Hold</Option>

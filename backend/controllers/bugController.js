@@ -77,8 +77,19 @@ const reportBug = async (req, res) => {
       console.error('Failed to send admin bug notifications:', emailErr.message);
     }
 
-    // Emit socket event if io exists
+    const notification = {
+      id: `${bug._id}-bug`,
+      type: 'bug',
+      title: 'New bug reported',
+      message: `${req.user.name} reported "${title}"`,
+      projectId: projectId.toString(),
+      projectName: project.name,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Emit socket events if io exists
     if (global.io) {
+      global.io.emit('newNotification', notification);
       global.io.to(projectId.toString()).emit('newBug', bug);
     }
 

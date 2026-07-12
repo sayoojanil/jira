@@ -1,6 +1,22 @@
 import { io, Socket } from 'socket.io-client';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://jira-m1jo.onrender.com';
+const getSocketUrl = (): string => {
+  if (import.meta.env.VITE_SOCKET_URL) {
+    return import.meta.env.VITE_SOCKET_URL;
+  }
+
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:5000';
+  }
+
+  return 'https://jira-m1jo.onrender.com';
+};
+
+const socketUrl = getSocketUrl();
 
 let socket: Socket | null = null;
 

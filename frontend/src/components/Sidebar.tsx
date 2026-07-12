@@ -1,11 +1,18 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../store';
+import { getFileUrl } from '../utils/api';
+
 import { LayoutDashboard, FolderOpen, Link as LinkIcon, Users, Settings, Bug, HelpCircle } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+
+
+  function pricingClicked() {
+ window.alert("Feature coming soon")
+  }
 
   const getLinks = () => {
     switch (user?.role) {
@@ -51,14 +58,35 @@ const Sidebar: React.FC = () => {
   const navLinks = getLinks();
 
   return (
-    <aside className="glass-panel hidden w-72 shrink-0 flex-col gap-6 rounded-[28px] border border-white/70 bg-white/70 p-5 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.2)] md:flex md:min-h-[calc(100vh-96px)]">
+    <aside className=" hidden w-72 shrink-0 flex-col gap-6 rounded-[28px] border border-white/70 p-5 shadow-lg md:flex md:min-h-[calc(100vh-96px)]">
       <div className="flex flex-col items-center gap-2 border-b border-sky-100/40 pb-6">
-        <div className="mt-2 text-center">
-          <div className="font-semibold text-slate-800">{user?.name}</div>
-          <div className="mt-1 text-xs font-medium capitalize text-sky-600">
-            {user?.role?.replace('_', ' ')}
-          </div>
-        </div>
+       <div className="mt-2 flex items-center gap-3">
+  {/* Profile Photo */}
+  <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full ">
+    {user?.profilePic ? (
+      <img
+        src={getFileUrl(user.profilePic)}
+        alt={user?.name || "Profile"}
+        className="h-full w-full object-cover"
+        draggable={false}
+      />
+    ) : (
+      <div className="flex h-full w-full items-center justify-center font-bold text-sky-700">
+        {user?.name?.[0]?.toUpperCase() || "U"}
+      </div>
+    )}
+  </div>
+
+  {/* Name & Role */}
+  <div className="min-w-0">
+    <div className="truncate font-semibold text-slate-800">
+      {user?.name}
+    </div>
+    <div className="text-xs font-medium capitalize text-sky-600">
+      {user?.role?.replace("_", " ")}
+    </div>
+  </div>
+</div>
       </div>
 
       <nav className="flex flex-1 flex-col gap-2">
@@ -80,8 +108,48 @@ const Sidebar: React.FC = () => {
             {link.icon}
             <span>{link.label}</span>
           </NavLink>
-        ))}
+        ))} 
       </nav>
+
+     <div className="rounded-3xl bg-gray-200 text-gray-700 p-5 text-white shadow-xl">
+  <div className="mb-3 flex items-center justify-between">
+    <div className="rounded-xl bg-yellow p-2 backdrop-blur">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 3l2.6 5.27L20 9.27l-4 3.9.94 5.46L12 16.8l-4.94 1.83L8 13.17l-4-3.9 5.4-1L12 3z"
+        />
+      </svg>
+    </div>
+
+    <span className="rounded-full bg-yellow-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-900">
+      PRO
+    </span>
+  </div>
+
+  <h3 className="text-lg font-bold text-gray-700  ">
+    Upgrade to Pro
+  </h3>
+
+  <p className="mt-2 text-sm leading-5  text-gray-600">
+   Unlock more features and powerfull tools
+  </p>
+
+  <button
+    onClick={pricingClicked}
+    className="mt-5 w-full rounded-2xl bg-white py-3 text-sm font-semibold text-sky-700 transition-all duration-300 hover:scale-[1.02] hover:bg-sky-50 active:scale-95"
+  >
+    Upgrade Now
+  </button>
+</div>
 
       <div className="border-t border-sky-100/40 pt-4 text-center">
         <div className="text-[10px] text-slate-400">Freelance Management v1.0</div>

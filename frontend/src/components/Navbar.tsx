@@ -1,21 +1,154 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store';
 import { logout } from '../store/authSlice';
-import { LogOut, User as UserIcon, Bell, Moon, Sun, Laptop } from 'lucide-react';
+import { LogOut, User as UserIcon, Bell, Moon, Sun, AlertCircle, FileText } from 'lucide-react';
 import { Badge, Dropdown, MenuProps, message } from 'antd';
 import { getFileUrl } from '../utils/api';
+import { getSocket } from '../utils/socket';
 import { useTheme } from '../context/ThemeContext';
+
+interface NotificationItem {
+  id: string;
+  type: 'bug' | 'file';
+  title: string;
+  message: string;
+  projectId?: string;
+  projectName?: string;
+  bugId?: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+const NOTIFICATION_STORAGE_KEY = 'taskflow-notifications';
 
 const Navbar: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    if (typeof window === 'undefined') return [];
 
-  function bellclick(){
-    message.error("feature coming soon!")
-  }
+    try {
+      const stored = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
+      if (!stored) return [];
+
+      const parsed = JSON.parse(stored) as NotificationItem[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const unreadCount = notifications.filter((item) => !item.isRead).length;
+  const currentProjectId = location.pathname.match(/^\/project\/([^/]+)/)?.[1] || null;
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    const pushNotification = (notification: NotificationItem) => {
+      setNotifications((prev) => {
+        const next = [notification, ...prev.filter((item) => item.id !== notification.id)].slice(0, 20);
+        return next;
+      });
+    };
+
+    const handleNotification = (notification: NotificationItem) => {
+      pushNotification(notification);
+    };
+
+    const handleNewBug = (bug: any) => {
+      pushNotification({
+        id: `bug-${bug._id || Date.now()}`,
+        type: 'bug',
+        title: 'New bug reported',
+        message: bug.title ? `"${bug.title}" was reported` : 'A new bug was reported',
+        projectId: bug.project || currentProjectId || undefined,
+        bugId: bug._id,
+        createdAt: new Date().toISOString(),
+        isRead: false,
+      });
+    };
+
+    const handleFileUploaded = (file: any) => {
+      pushNotification({
+        id: `file-${file._id || Date.now()}`,
+        type: 'file',
+        title: 'New file uploaded',
+        message: file.name ? `"${file.name}" was uploaded` : 'A new file was uploaded',
+        projectId: file.project || currentProjectId || undefined,
+        createdAt: new Date().toISOString(),
+        isRead: false,
+      });
+    };
+
+    const handleBugUpdated = (updatedBug: any) => {
+      if (updatedBug?.status === 'Fixed' || updatedBug?.status === 'Closed') {
+        setNotifications((prev) => prev.filter((item) => item.bugId !== updatedBug._id));
+      }
+    };
+
+    socket.on('newNotification', handleNotification);
+
+    if (currentProjectId) {
+      socket.emit('joinProject', currentProjectId);
+      socket.on('newBug', handleNewBug);
+      socket.on('fileUploaded', handleFileUploaded);
+      socket.on('bugUpdated', handleBugUpdated);
+    }
+
+    return () => {
+      socket.off('newNotification', handleNotification);
+      if (currentProjectId) {
+        socket.emit('leaveProject', currentProjectId);
+        socket.off('newBug', handleNewBug);
+        socket.off('fileUploaded', handleFileUploaded);
+        socket.off('bugUpdated', handleBugUpdated);
+      }
+    };
+  }, [currentProjectId]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifications));
+    }
+  }, [notifications]);
+
+  const handleNotificationClick = (item: NotificationItem) => {
+    if (item.projectId) {
+      navigate(`/project/${item.projectId}`);
+    }
+  };
+
+  const notificationMenuItems: MenuProps['items'] = notifications.length
+    ? notifications.map((item) => ({
+        key: item.id,
+        label: (
+          <button
+            onClick={() => handleNotificationClick(item)}
+            className="flex w-full items-start gap-2 rounded-lg px-2 py-2 text-left hover:bg-slate-50"
+          >
+            <div className="mt-0.5 rounded-full bg-sky-100 p-1.5 text-sky-700">
+              {item.type === 'bug' ? <AlertCircle size={15} /> : <FileText size={15} />}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-slate-800">{item.title}</div>
+              <div className="text-xs text-slate-500">{item.message}</div>
+              {item.projectName && (
+                <div className="mt-1 text-[11px] font-medium text-sky-600">{item.projectName}</div>
+              )}
+            </div>
+          </button>
+        ),
+      }))
+    : [
+        {
+          key: 'empty',
+          label: <div className="px-3 py-3 text-sm text-slate-500">No notifications yet.</div>,
+        },
+      ];
 
   const handleLogout = () => {
     if(window.confirm("Are you sure you want to logout?"))
@@ -97,18 +230,29 @@ const Navbar: React.FC = () => {
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
 
-        {/* <Badge count={2} size="small" offset={[-2, 2]}> */}
-          <button
-            onClick={bellclick}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
+        <Badge count={unreadCount} size="small" offset={[-2, 2]} overflowCount={9}>
+          <Dropdown
+            menu={{ items: notificationMenuItems }}
+            trigger={['click']}
+            placement="bottomRight"
+            onOpenChange={(open) => {
+              if (open) {
+                setNotifications((prev) => prev.map((item) => ({ ...item, isRead: true })));
+              }
+            }}
           >
-            <Bell size={18} />
-          </button>
-        {/* </Badge> */}
+            <button
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-slate-500 transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
+              aria-label="Notifications"
+            >
+              <Bell size={18} />
+            </button>
+          </Dropdown>
+        </Badge>
 
         <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-          <div className="flex cursor-pointer items-center gap-3 rounded-full border border-sky-100/60 bg-white/60 p-1.5 pr-3 transition-all duration-300 hover:bg-sky-50">
-            <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-sky-100">
+          <div className="flex cursor-pointer items-center gap-3  p-1.5 pr-3 transition-all duration-300 hover:bg-sky-50">
+            <div className="h-8 w-8 flex-shrink-0 overflow-hidden ">
               {user?.profilePic ? (
                 <img
                   src={getFileUrl(user.profilePic)}

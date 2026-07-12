@@ -15,9 +15,15 @@ const AppWrapper: React.FC = () => {
       theme={{
         algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
         token: {
-          colorPrimary: '#0ea5e9',
+          colorPrimary: theme === 'dark' ? '#60a5fa' : '#0ea5e9',
           borderRadius: 12,
           fontFamily: 'Inter, sans-serif',
+          colorBgContainer: theme === 'dark' ? '#0a0a0a' : '#ffffff',
+          colorBgElevated: theme === 'dark' ? '#111111' : '#ffffff',
+          colorBorder: theme === 'dark' ? '#2a2a2a' : '#d9d9d9',
+          colorText: theme === 'dark' ? '#f3f4f6' : '#0f172a',
+          colorTextSecondary: theme === 'dark' ? '#9ca3af' : '#64748b',
+          colorBgLayout: theme === 'dark' ? '#000000' : '#f8fbff',
         },
       }}
     >
