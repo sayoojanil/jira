@@ -83,6 +83,12 @@ const ProjectDetails: React.FC = () => {
   const [bugPriority, setBugPriority] = useState('Medium');
   const [bugScreenshots, setBugScreenshots] = useState<FileList | null>(null);
 
+
+
+  const [togglingMilestone, setTogglingMilestone] = useState<string | null>(null);
+
+
+
   // New Milestone form
   const [msTitle, setMsTitle] = useState('');
   const [msDueDate, setMsDueDate] = useState('');
@@ -229,35 +235,45 @@ const ProjectDetails: React.FC = () => {
     }
   }, [id, token]);
 
-  const toggleMilestone = async (milestoneId: string, isCompleted: boolean) => {
-    if (!project) return;
+ const toggleMilestone = async (milestoneId: string, isCompleted: boolean) => {
+  if (!project) return;
 
-    if (user?.role !== 'team_member') {
-      message.error('Only team members can update project milestones');
-      return;
-    }
+  if (user?.role !== "team_member") {
+    message.error("Only team members can update project milestones");
+    return;
+  }
 
-    try {
-      const updatedMilestones = milestones.map((m) =>
-        m._id === milestoneId ? { ...m, isCompleted } : m
-      );
+  try {
+    setTogglingMilestone(milestoneId);
 
-      const completedCount = updatedMilestones.filter((m) => m.isCompleted).length;
-      const totalCount = updatedMilestones.length;
-      const calculatedProgress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+    const updatedMilestones = milestones.map((m) =>
+      m._id === milestoneId ? { ...m, isCompleted } : m
+    );
 
-      const res = await API.put(`/projects/${project._id}`, {
-        milestones: updatedMilestones,
-        progress: calculatedProgress,
-      });
+    const completedCount = updatedMilestones.filter((m) => m.isCompleted).length;
+    const totalCount = updatedMilestones.length;
+    const calculatedProgress =
+      totalCount > 0
+        ? Math.round((completedCount / totalCount) * 100)
+        : 0;
 
-      setProject(res.data.data);
-      setMilestones(res.data.data.milestones);
-      message.success('Milestone updated successfully');
-    } catch (err: any) {
-      message.error(err.response?.data?.message || 'Failed to update milestone');
-    }
-  };
+    const res = await API.put(`/projects/${project._id}`, {
+      milestones: updatedMilestones,
+      progress: calculatedProgress,
+    });
+
+    setProject(res.data.data);
+    setMilestones(res.data.data.milestones);
+
+    message.success("Milestone updated successfully");
+  } catch (err: any) {
+    message.error(
+      err.response?.data?.message || "Failed to update milestone"
+    );
+  } finally {
+    setTogglingMilestone(null);
+  }
+};
 
   const handleAddMilestone = async () => {
     if (!msTitle || !project) return;
@@ -724,12 +740,12 @@ const ProjectDetails: React.FC = () => {
         >
           {/* Tab 1: Milestones & Specs */}
           <TabPane
-            tab={
-              <span className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-semibold">
-                <CheckSquare size={14} className="md:w-4 md:h-4" /> 
-                <span className="hidden xs:inline">Overview</span>
-              </span>
-            }
+           tab={
+  <span className="hidden lg:flex items-center gap-2 font-semibold px-2">
+    <CheckSquare size={18} />
+    <span>Overview</span>
+  </span>
+}
             key="1"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 mt-3 md:mt-4">
@@ -758,19 +774,26 @@ const ProjectDetails: React.FC = () => {
                         <div
                           key={m._id}
                           className={`p-3 md:p-4 border rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition duration-200 ${
-                            m.isCompleted ? 'bg-emerald-50/20 border-emerald-100/50' : 'bg-white border-sky-100/30'
+                            m.isCompleted ? 'bg-emerald-50/20 border-green-600/50' : 'bg-white border-sky-100/30'
                           }`}
                         >
                           <div className="flex items-start gap-3 min-w-0 flex-1">
                             <button
                               onClick={() => toggleMilestone(m._id, !m.isCompleted)}
-                              className="mt-0.5 text-sky-500 hover:text-indigo-600 shrink-0 rounded-full"
+                              className="mt-0.5 text-green-500 hover:text-indigo-600 shrink-0 rounded-full"
                             >
-                              {m.isCompleted ? (
-                                <CheckCircle2 size={18} className="text-white bg-green-500 rounded-full" />
-                              ) : (
-                                <div className="h-[18px] w-[18px] border-2 rounded-full border-sky-200 hover:border-sky-500" />
-                              )}
+                             {togglingMilestone === m._id ? (
+  <div className="h-[18px] w-[18px] rounded-full  border-sky-300 flex items-center justify-center">
+    <Loader2 className="h-3 w-3 animate-spin text-green-500" />
+  </div>
+) : m.isCompleted ? (
+  <CheckCircle2
+    size={18}
+    className="text-white bg-green-400 rounded-full "
+  />
+) : (
+  <div className="h-[18px] w-[18px] rounded-full border-2 border-sky-200 hover:border-sky-500 transition-colors" />
+)}
                             </button>
                             <div className="min-w-0 flex-1">
                               <span
@@ -788,7 +811,7 @@ const ProjectDetails: React.FC = () => {
                             </div>
                           </div>
                           <div className="shrink-0">
-                            <Tag color={m.isCompleted ? 'success' : 'default'} className="text-[10px]">
+                            <Tag color={m.isCompleted ? 'success' : 'error'} className="text-[10px]">
                               {m.isCompleted ? 'Done' : 'Pending'}
                             </Tag>
                           </div>
@@ -910,13 +933,13 @@ const ProjectDetails: React.FC = () => {
 
           {/* Tab 2: File Sharing Module */}
           <TabPane
-            tab={
-              <span className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-semibold">
-                <FolderArchive size={14} className="md:w-4 md:h-4" /> 
-                <span className="hidden xs:inline">Files</span>
-                <Badge count={files.length} className="hidden xs:inline-flex" />
-              </span>
-            }
+        tab={
+  <span className="hidden lg:flex items-center gap-2 font-semibold px-2">
+    <FolderArchive size={18} />
+    <span>Files</span>
+    <Badge count={files.length} />
+  </span>
+}
             key="2"
           >
             <div className="space-y-4 md:space-y-6 mt-3 md:mt-4">
@@ -1023,17 +1046,17 @@ const ProjectDetails: React.FC = () => {
 
           {/* Tab 3: Bug Reporting System */}
           <TabPane
-            tab={
-              <span className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-semibold">
-                <BugIcon size={14} className="md:w-4 md:h-4" />
-                <span className="hidden xs:inline">Bugs</span>
-                {activeBugCount > 0 ? (
-                  <Badge count={activeBugCount} className="bg-red-500 rounded-full" />
-                ) : (
-                  <Badge dot className="bg-green-500" />
-                )}
-              </span>
-            }
+           tab={
+  <span className="hidden lg:flex items-center gap-2 font-semibold px-2">
+    <BugIcon size={18} />
+    <span>Bugs</span>
+    {activeBugCount > 0 ? (
+      <Badge count={activeBugCount} />
+    ) : (
+      <Badge dot />
+    )}
+  </span>
+}
             key="3"
           >
             <div className="space-y-4 md:space-y-6 mt-3 md:mt-4">
@@ -1100,12 +1123,12 @@ const ProjectDetails: React.FC = () => {
 
           {/* Tab 4: Activity Feed */}
           <TabPane
-            tab={
-              <span className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-semibold">
-                <ActivityIcon size={14} className="md:w-4 md:h-4" /> 
-                <span className="hidden xs:inline">Activity</span>
-              </span>
-            }
+          tab={
+  <span className="hidden lg:flex items-center gap-2 font-semibold px-2">
+    <ActivityIcon size={18} />
+    <span>Activity</span>
+  </span>
+}
             key="4"
           >
             <div className="mt-3 md:mt-4">

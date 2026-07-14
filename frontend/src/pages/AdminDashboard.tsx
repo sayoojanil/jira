@@ -58,6 +58,7 @@ const AdminDashboard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('name-asc');
 
   // Multi-select state for new project
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
@@ -160,11 +161,39 @@ const AdminDashboard: React.FC = () => {
   };
 
   // Filters projects
-  const filteredProjects = projects.filter((project) => {
-    const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || project.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredProjects = projects
+    .filter((project) => {
+      const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'All' || project.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'name-asc') {
+        return a.name.localeCompare(b.name);
+      }
+      if (sortBy === 'name-desc') {
+        return b.name.localeCompare(a.name);
+      }
+      if (sortBy === 'deadline-asc') {
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      }
+      if (sortBy === 'deadline-desc') {
+        return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
+      }
+      if (sortBy === 'progress-desc') {
+        return (b.progress || 0) - (a.progress || 0);
+      }
+      if (sortBy === 'progress-asc') {
+        return (a.progress || 0) - (b.progress || 0);
+      }
+      if (sortBy === 'created-desc') {
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      }
+      if (sortBy === 'created-asc') {
+        return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+      }
+      return 0;
+    });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -504,6 +533,21 @@ const AdminDashboard: React.FC = () => {
               <Option value="Checking">Checking</Option>
               <Option value="Completed">Completed</Option>
               <Option value="On Hold">On Hold</Option>
+            </Select>
+            <Select
+              value={sortBy}
+              onChange={(value) => setSortBy(value)}
+              className="w-full sm:w-48"
+              dropdownClassName="rounded-xl"
+            >
+              <Option value="name-asc">Name (A-Z)</Option>
+              <Option value="name-desc">Name (Z-A)</Option>
+              <Option value="deadline-asc">Deadline (Soonest)</Option>
+              <Option value="deadline-desc">Deadline (Latest)</Option>
+              <Option value="progress-desc">Progress (Highest)</Option>
+              <Option value="progress-asc">Progress (Lowest)</Option>
+              <Option value="created-desc">Newest Created</Option>
+              <Option value="created-asc">Oldest Created</Option>
             </Select>
           </div>
         </div>

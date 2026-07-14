@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store';
 import { logout } from '../store/authSlice';
-import { LogOut, User as UserIcon, Bell, Moon, Sun, AlertCircle, FileText } from 'lucide-react';
+import { LogOut, User as UserIcon, Bell, Moon, Sun, AlertCircle, FileText, ArrowBigDown, ChevronDown } from 'lucide-react';
 import { Badge, Dropdown, MenuProps, message } from 'antd';
 import { getFileUrl } from '../utils/api';
 import { getSocket } from '../utils/socket';
@@ -250,28 +250,37 @@ const Navbar: React.FC = () => {
           </Dropdown>
         </Badge>
 
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-          <div className="flex cursor-pointer items-center gap-3  p-1.5 pr-3 transition-all duration-300 hover:bg-sky-50">
-            <div className="h-8 w-8 flex-shrink-0 overflow-hidden ">
-              {user?.profilePic ? (
-                <img
-                  src={getFileUrl(user.profilePic)}
-                  alt={user?.name || 'Profile'}
-                  className="block h-full w-full rounded-full object-cover"
-                  draggable={false}
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center font-bold text-sky-700">
-                  {user?.name?.[0]?.toUpperCase() || 'U'}
-                </div>
-              )}
-            </div>
-            <div className="hidden text-left md:block">
-              <div className="text-xs font-semibold text-slate-700">{user?.name}</div>
-              <div className="text-[10px] capitalize text-slate-400">{user?.role?.replace('_', ' ')}</div>
-            </div>
-          </div>
-        </Dropdown>
+       <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+  <div className="flex cursor-pointer items-center gap-3 p-1.5 pr-3 transition-all duration-300 hover:bg-sky-50">
+    <div className="h-8 w-8 flex-shrink-0 overflow-hidden">
+      {user?.profilePic ? (
+        <img
+          src={getFileUrl(user.profilePic)}
+          alt={user?.name || 'Profile'}
+          className="block h-full w-full rounded-full object-cover"
+          draggable={false}
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center font-bold text-sky-700">
+          {user?.name?.[0]?.toUpperCase() || 'U'}
+        </div>
+      )}
+    </div>
+
+    <div className="hidden md:flex items-center gap-2">
+      <div>
+        <div className="text-xs font-semibold text-slate-700">
+          {user?.name}
+        </div>
+        <div className="text-[10px] capitalize text-slate-400">
+          {user?.role?.replace('_', ' ')}
+        </div>
+      </div>
+
+      <ChevronDown size={14} className="text-black" />
+    </div>
+  </div>
+</Dropdown>
       </div>
     </nav>
   );
