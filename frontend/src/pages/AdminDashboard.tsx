@@ -381,7 +381,7 @@ const AdminDashboard: React.FC = () => {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-5 rounded-full py-3 !bg-sky-700 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold shadow-md shadow-sky-200 hover:shadow-lg transition-all"
+          className="flex items-center gap-2 px-5 rounded-md py-3 !bg-[#0055FF] hover:from-sky-600 hover:to-indigo-700 text-white font-semibold shadow-md shadow-sky-200 hover:shadow-lg transition-all"
         >
           <Plus size={18} />
           <span>New Project</span>
@@ -432,7 +432,7 @@ const AdminDashboard: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => window.open(`/team-member/${member._id}`, '_self')}
-                    className="w-full h-10 py-2 rounded-full !bg-sky-700 text-white text-xs font-semibold hover:bg-sky-600 transition"
+                    className="w-full h-10 py-2 rounded-full bg-[#0055FF] text-white text-xs font-semibold hover:bg-sky-600 transition"
                   >
                     View Profile
                   </button>

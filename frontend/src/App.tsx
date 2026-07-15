@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import PerformanceToggle from './components/PerformanceToggle';
 import { Toaster } from 'sonner';
+// import RolePermissions from './pages/RolePermissions';
 
 import RoleGuard from './components/RoleGuard';
 import { useAppSelector } from './store';
@@ -19,6 +20,7 @@ import TeamDashboard from './pages/TeamDashboard';
 import TeamMemberProfile from './pages/TeamMemberProfile';
 import ProjectDetails from './pages/ProjectDetails';
 import LatestLinks from './pages/LatestLinks';
+import RolePermissions from './pages/RolePermissions';
 
 // Shared Layout with Sidebar
 const AppLayout: React.FC = () => {
@@ -109,6 +111,14 @@ const App: React.FC = () => {
           element={
             <RoleGuard allowedRoles={['team_member']}>
               <TeamDashboard />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/permissions"
+          element={
+            <RoleGuard >
+              <RolePermissions />
             </RoleGuard>
           }
         />

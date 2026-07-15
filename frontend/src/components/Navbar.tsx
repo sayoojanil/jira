@@ -2,8 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store';
 import { logout } from '../store/authSlice';
-import { LogOut, User as UserIcon, Bell, Moon, Sun, AlertCircle, FileText, ArrowBigDown, ChevronDown } from 'lucide-react';
-import { Badge, Dropdown, MenuProps, message } from 'antd';
+import {
+  LogOut,
+  User as UserIcon,
+  Bell,
+  Moon,
+  Sun,
+  AlertCircle,
+  FileText,
+  ChevronDown,
+  Settings,
+  Shield,
+  Users
+} from 'lucide-react';import { Badge, Dropdown, MenuProps, message } from 'antd';
 import { getFileUrl } from '../utils/api';
 import { getSocket } from '../utils/socket';
 import { useTheme } from '../context/ThemeContext';
@@ -186,9 +197,47 @@ const Navbar: React.FC = () => {
               >
                 <UserIcon size={16} />
                 <span>My Profile</span>
+                
               </button>
+              
             ),
           },
+          {
+  key: 'settings',
+  label: (
+    <button
+      onClick={() => navigate('/settings')}
+      className="w-full flex items-center gap-2 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 rounded-lg transition"
+    >
+      <Settings size={16} />
+      <span>Settings</span>
+    </button>
+  ),
+},
+{
+  key: 'roles',
+  label: (
+    <button
+      onClick={() => navigate('/team/permissions')}
+      className="w-full flex items-center gap-2 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 rounded-lg transition"
+    >
+      <Users size={16} />
+      <span>Roles and permissions</span>
+    </button>
+  ),
+},
+// {
+//   key: 'permissions',
+//   label: (
+//     <button
+//       onClick={() => navigate('/permissions')}
+//       className="w-full flex items-center gap-2 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 rounded-lg transition"
+//     >
+//       <Shield size={16} />
+//       <span>Permissions</span>
+//     </button>
+//   ),
+// },
         ]
       : []),
     {
@@ -202,9 +251,12 @@ const Navbar: React.FC = () => {
           <span>Sign Out</span>
         </button>
         
+        
       ),
     },
+    
   ];
+  
 
   return (
     <nav className="glass-panel sticky top-3 z-40 mx-3 mt-3 flex items-center justify-between rounded-full border border-white/70 px-5 py-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.2)] sm:px-6">

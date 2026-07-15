@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../store';
 import { authSuccess } from '../store/authSlice';
 import API, { getFileUrl } from '../utils/api';
-import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X, MoveLeft, MoveRight, MoveUp, MoveDown, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X, MoveLeft, MoveRight, MoveUp, MoveDown, ZoomIn, ZoomOut, Badge, CheckCircle2 } from 'lucide-react';
 import { Button, message, Tag, Input, Upload, Spin, Modal } from 'antd';
 
 const TeamMemberProfile: React.FC = () => {
@@ -294,8 +294,12 @@ const TeamMemberProfile: React.FC = () => {
                   </button>
                 </Upload>
               )}
+              
             </div>
-
+<div className="flex items-center justify-center  rounded-full sm:justify-start gap-1 mt-5">
+  <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
+  <span className="text-sm font-medium text-green-500">Verified</span>
+</div>
             <div className="mt-4 flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">{profile.name}</h1>

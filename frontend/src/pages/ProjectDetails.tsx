@@ -32,6 +32,7 @@ import {
   Paperclip,
   Link,
   MoreVertical,
+  FileDown,
 } from 'lucide-react';
 import {
   Tabs,
@@ -70,6 +71,7 @@ const ProjectDetails: React.FC = () => {
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
   // Modal forms states
   const [isBugModalOpen, setIsBugModalOpen] = useState(false);
@@ -323,6 +325,42 @@ const ProjectDetails: React.FC = () => {
       message.success('Project status updated');
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Failed to update status');
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    if (!project) return;
+    try {
+      setDownloadingInvoice(true);
+      const token = localStorage.getItem('token');
+      const baseUrl = (import.meta.env.VITE_API_URL || 'https://jira-m1jo.onrender.com/api');
+      const response = await fetch(`${baseUrl}/projects/${project._id}/invoice`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to generate invoice');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = project.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      a.download = `invoice_${safeName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      message.success('Invoice PDF downloaded successfully!');
+    } catch (err: any) {
+      message.error(err.message || 'Failed to download invoice');
+    } finally {
+      setDownloadingInvoice(false);
     }
   };
 
@@ -712,6 +750,26 @@ const ProjectDetails: React.FC = () => {
                 </Select>
               </div>
             )}
+
+            {/* Download Invoice PDF */}
+            <div className="space-y-1.5 w-full lg:w-auto">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                Invoice
+              </label>
+              <button
+                onClick={handleDownloadInvoice}
+                disabled={downloadingInvoice}
+                className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#89F336] hover:from-indigo-700 hover:to-blue-700 disabled:opacity-60 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-200 hover:shadow-indigo-300/50 hover:scale-105 active:scale-95"
+                title="Download Project Invoice as PDF"
+              >
+                {downloadingInvoice ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <FileDown size={14} />
+                )}
+                <span>{downloadingInvoice ? 'Generating...' : 'Download Invoice'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Global Progress Bar */}
@@ -1067,7 +1125,7 @@ const ProjectDetails: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setIsBugModalOpen(true)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm transition"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 bg-[#FF2C2C] hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm transition"
                 >
                   <AlertCircle size={14} />
                   <span>Report Issue</span>

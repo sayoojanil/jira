@@ -76,7 +76,7 @@ function handleClick() {
               <div className="mb-3 inline-flex rounded-full border border-sky-100/80 bg-sky-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-sky-700">
                 TaskFlow
               </div>
-              <h2 className="text-3xl font-semibold tracking-tight text-slate-800">Welcome back</h2>
+              <h2 className="text-3xl font-semibold tracking-tight text-slate-800">Welcome back!</h2>
               <p className="mt-2 text-sm text-slate-500">Sign in to manage your freelance projects with calm clarity.</p>
             </div>
 
@@ -157,7 +157,7 @@ function handleClick() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-sky-700 px-4 py-3 font-semibold text-white shadow-lg shadow-sky-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-600 hover:shadow-sky-300 disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0055FF] px-4 py-3 font-semibold text-white shadow-lg shadow-sky-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-600 hover:shadow-sky-300 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="animate-spin" size={18} /> : 'Sign In'}
               </button>

@@ -1,8 +1,10 @@
 const Project = require('../models/Project');
 const User = require('../models/User');
+const Bug = require('../models/Bug');
 const ActivityLog = require('../models/ActivityLog');
 const crypto = require('crypto');
 const { uploadToCloudOrLocal } = require('../utils/cloudinary');
+const { generateProjectInvoice } = require('../utils/pdfInvoice');
 
 const parseFormArray = (value) => {
   if (Array.isArray(value)) return value;
@@ -368,6 +370,56 @@ const deleteProject = async (req, res) => {
   }
 };
 
+// @desc    Download professional PDF invoice for a project
+// @route   GET /api/projects/:id/invoice
+// @access  Private
+const downloadInvoice = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id)
+      .populate('client', 'name email')
+      .populate('assignedClients', 'name email')
+      .populate('assignedTeam', 'name email');
+
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+
+    // Role-based access
+    if (req.user.role === 'client') {
+      const isAssigned =
+        (project.client && project.client._id.toString() === req.user.id) ||
+        (project.assignedClients && project.assignedClients.some((c) => c._id.toString() === req.user.id));
+      if (!isAssigned) {
+        return res.status(403).json({ success: false, message: 'Not authorized to access this invoice' });
+      }
+    }
+
+    if (
+      req.user.role === 'team_member' &&
+      !project.assignedTeam.some((m) => m._id.toString() === req.user.id)
+    ) {
+      return res.status(403).json({ success: false, message: 'Not assigned to this project' });
+    }
+
+    const bugs = await Bug.find({ project: project._id }).populate('reporter', 'name email');
+
+    // Find admin user for signature
+    const adminUser = await User.findOne({ role: 'admin' }).select('name email');
+
+    const safeName = project.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const filename = `invoice_${safeName}_${Date.now()}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const pdfDoc = generateProjectInvoice(project, bugs, adminUser);
+    pdfDoc.pipe(res);
+  } catch (error) {
+    console.error('PDF generation error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to generate invoice: ' + error.message });
+  }
+};
+
 module.exports = {
   createProject,
   getProjects,
@@ -375,4 +427,5 @@ module.exports = {
   redeemProjectToken,
   updateProject,
   deleteProject,
+  downloadInvoice,
 };

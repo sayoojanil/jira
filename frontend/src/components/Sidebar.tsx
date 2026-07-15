@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../store';
 import { getFileUrl } from '../utils/api';
 
-import { LayoutDashboard, FolderOpen, Link as LinkIcon, Users, Settings, Bug, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, FolderOpen, Link as LinkIcon, Users, Settings, Bug, HelpCircle, BaggageClaim } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -41,6 +41,17 @@ const Sidebar: React.FC = () => {
             label: 'My Profile',
             icon: <Users size={18} />,
           },
+          {
+            to: '/',
+            label: 'Settings',
+            icon: <Settings size={18} />,
+          },
+
+            {
+            to: '/permissions',
+            label: 'Roles and permissions',
+            icon: <BaggageClaim size={18} />,
+          },
         ];
       case 'client':
         return [
@@ -48,6 +59,17 @@ const Sidebar: React.FC = () => {
             to: '/client',
             label: 'Client Dashboard',
             icon: <LayoutDashboard size={18} />,
+          },
+            {
+            to: '/',
+            label: 'Settings',
+            icon: <Settings size={18} />,
+          },
+
+            {
+            to: '/permissions',
+            label: 'Roles and permissions',
+            icon: <BaggageClaim size={18} />,
           },
         ];
       default:
@@ -98,9 +120,9 @@ const Sidebar: React.FC = () => {
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
+              `flex items-center gap-3 rounded-full px-4 py-3 text-sm font-medium transition-all duration-300 ${
                 isActive
-                  ? 'bg-sky-700 text-white shadow-lg shadow-sky-200/70'
+                  ? 'text-blue-500'
                   : 'text-slate-600 hover:bg-white/70 hover:text-sky-600'
               }`
             }
