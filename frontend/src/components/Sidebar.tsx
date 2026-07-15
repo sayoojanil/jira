@@ -133,7 +133,7 @@ const Sidebar: React.FC = () => {
         ))} 
       </nav>
 
-     <div className="rounded-3xl bg-gray-200 text-gray-700 p-5 text-white shadow-xl">
+     <div className="rounded-3xl bg-[#0000FF] text-gray-700 p-5 text-white shadow-xl">
   <div className="mb-3 flex items-center justify-between">
     <div className="rounded-xl bg-yellow p-2 backdrop-blur">
       <svg
@@ -152,16 +152,16 @@ const Sidebar: React.FC = () => {
       </svg>
     </div>
 
-    <span className="rounded-full bg-yellow-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-900">
+    <span className="rounded-full bg-[#FFDE21] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-900">
       PRO
     </span>
   </div>
 
-  <h3 className="text-lg font-bold text-gray-700  ">
+  <h3 className="text-lg font-bold text-white  ">
     Upgrade to Pro
   </h3>
 
-  <p className="mt-2 text-sm leading-5  text-gray-600">
+  <p className="mt-2 text-sm leading-5  text-white">
    Unlock more features and powerfull tools
   </p>
 

@@ -55,14 +55,14 @@ const columns = [
       allowed ? (
         <CheckCircleFilled
           style={{
-            color: "#22c55e",
+            color: "#00F700",
             fontSize: 20,
           }}
         />
       ) : (
         <CloseCircleFilled
           style={{
-            color: "#ef4444",
+            color: "#E90000",
             fontSize: 20,
           }}
         />

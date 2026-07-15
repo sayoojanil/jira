@@ -218,7 +218,7 @@ const Navbar: React.FC = () => {
   key: 'roles',
   label: (
     <button
-      onClick={() => navigate('/team/permissions')}
+      onClick={() => navigate('/permissions')}
       className="w-full flex items-center gap-2 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 rounded-lg transition"
     >
       <Users size={16} />

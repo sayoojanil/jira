@@ -94,15 +94,17 @@ const TeamDashboard: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
-        <Spin size="large" />
-                              <span className="text-sm font-semibold text-slate-600">Loading team workspace...</span>
-
+if (loading) {
+  return (
+    <div className="flex items-center justify-center w-full h-full min-h-screen">
+      <div className="flex flex-row gap-2 ">
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

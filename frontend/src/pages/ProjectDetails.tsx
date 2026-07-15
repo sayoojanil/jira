@@ -455,6 +455,10 @@ const ProjectDetails: React.FC = () => {
 
   const handleBugComment = async () => {
     if (!activeBug) return;
+    if (!bugComment || !bugCommentFiles) 
+      message.error("Please enter a comment or upload a file.");
+      return;
+
 
     const hasText = bugComment.trim().length > 0;
     const hasAttachments = bugCommentFiles && bugCommentFiles.length > 0;
@@ -759,7 +763,7 @@ const ProjectDetails: React.FC = () => {
               <button
                 onClick={handleDownloadInvoice}
                 disabled={downloadingInvoice}
-                className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#89F336] hover:from-indigo-700 hover:to-blue-700 disabled:opacity-60 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-200 hover:shadow-indigo-300/50 hover:scale-105 active:scale-95"
+                className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#6EE000] hover:from-indigo-700 hover:to-blue-700 disabled:opacity-60 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-200 hover:shadow-indigo-300/50 hover:scale-105 active:scale-95"
                 title="Download Project Invoice as PDF"
               >
                 {downloadingInvoice ? (
@@ -780,10 +784,10 @@ const ProjectDetails: React.FC = () => {
             </div>
             <Progress 
               percent={project.progress} 
-              strokeColor="#0e62e9ff" 
+              strokeColor="#0ea5e9" 
               size="small" 
               showInfo={false}
-              strokeWidth={6}
+              strokeWidth={8}
             />
           </div>
         </GlassCard>
@@ -818,7 +822,7 @@ const ProjectDetails: React.FC = () => {
                     {user?.role !== 'client' && (
                       <button
                         onClick={() => setIsNewMilestoneOpen(true)}
-                        className="w-full sm:w-auto px-3 md:px-4 py-1.5 md:py-2 bg-sky-600 hover:bg-sky-700 text-white text-[10px] md:text-xs font-semibold rounded-full shadow-sm transition flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto px-3 md:px-4 py-1.5 md:py-2 bg-[#0055FF] hover:bg-sky-700 text-white text-[10px] md:text-xs font-semibold rounded-full shadow-sm transition flex items-center justify-center gap-1.5"
                       >
                         <span>+</span>
                         <span>Add Milestone</span>
@@ -847,7 +851,7 @@ const ProjectDetails: React.FC = () => {
 ) : m.isCompleted ? (
   <CheckCircle2
     size={18}
-    className="text-white bg-green-400 rounded-full "
+    className="text-white bg-[#00F700] rounded-full "
   />
 ) : (
   <div className="h-[18px] w-[18px] rounded-full border-2 border-sky-200 hover:border-sky-500 transition-colors" />
@@ -982,7 +986,7 @@ const ProjectDetails: React.FC = () => {
                   </div>
                   <br></br>
                   <div className="flex justify-center border-t border-sky-100 pt-4">
-                  <a href='/team' className='text-blue-600 cursor-pointer hover:text-blue-800' >View all members</a>
+                  <a href='/team' className='text-[#0ea5e9] cursor-pointer hover:text-blue-800' >View all members</a>
                   </div>
                 </GlassCard>
               </div>
@@ -1028,7 +1032,7 @@ const ProjectDetails: React.FC = () => {
                       <p className="text-[10px] md:text-xs text-slate-400 mb-3 md:mb-4 max-w-xs">
                         Upload specs, designs, code, or documents
                       </p>
-                      <label className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition">
+                      <label className="px-4 py-2 bg-[#0055FF] text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition">
                         Browse Files
                         <input
                           type="file"
@@ -1549,8 +1553,8 @@ const ProjectDetails: React.FC = () => {
                     <Button
                       type="primary"
                       onClick={handleBugComment}
-                      disabled={(!bugComment.trim() && !bugStatusUpdate && (!bugCommentFiles || bugCommentFiles.length === 0)) || submittingComment}
-                      className="!bg-sky-600 hover:!bg-sky-700 rounded-full text-xs"
+                      // disabled={(!bugComment.trim() && !bugStatusUpdate && (!bugCommentFiles || bugCommentFiles.length === 0)) || submittingComment}
+                      className="!bg-[#0055FF] text-white hover:!bg-[#0055FF] rounded-full text-xs"
                     >
                       {submittingComment ? 'Uploading...' : 'Submit'}
                     </Button>
@@ -1610,7 +1614,7 @@ const ProjectDetails: React.FC = () => {
                 type="button"
                 onClick={handleAddMilestone}
                 disabled={!msTitle || !msDueDate || addingMilestone}
-                className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition flex items-center justify-center gap-2"
+                className="px-5 py-2.5 bg-[#4C87FE] hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition flex items-center justify-center gap-2"
               >
                 {addingMilestone ? (
                   <>

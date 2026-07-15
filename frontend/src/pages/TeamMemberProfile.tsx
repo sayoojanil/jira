@@ -233,15 +233,18 @@ const TeamMemberProfile: React.FC = () => {
     setIsEditing(false);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
-        <Spin size="large" />
-                              <span className="text-sm font-semibold text-slate-600">Loading profile...</span>
-
+if (loading) {
+  return (
+    <div className="flex items-center justify-center w-full h-full min-h-screen">
+      <div className="flex flex-row gap-2 ">
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   const skillsList: string[] = profile?.skills || [];
 
@@ -275,7 +278,10 @@ const TeamMemberProfile: React.FC = () => {
                     className="h-full w-full object-cover object-center"
                   />
                 ) : (
-                  profile.name?.[0]?.toUpperCase() || 'T'
+                  <img src='https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'
+                  className="h-full w-full object-cover object-center"
+                  
+                />
                 )}
               </button>
               {isOwnProfile && (
@@ -317,9 +323,9 @@ const TeamMemberProfile: React.FC = () => {
                   icon={<Pencil size={14} />}
                   onClick={() => setIsEditing(true)}
                   shape="round"
-                  className="!flex !items-center !gap-1.5 !border-sky-700 !text-sky-700 !font-semibold shrink-0 text-xs"
+                  className="!flex !items-center !gap-1.5 !text-white bg-[#0055FF] !font-semibold shrink-0 text-xs"
                 >
-                  Edit profile
+                  Edit Profile
                 </Button>
               )}
             </div>
@@ -480,7 +486,7 @@ const TeamMemberProfile: React.FC = () => {
                 htmlType="submit"
                 loading={uploading || isSubmitting}
                 shape="round"
-                className="!bg-sky-700"
+                className="!bg-[#0055FF]"
               >
                 Save
               </Button>

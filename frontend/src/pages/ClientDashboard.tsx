@@ -94,15 +94,18 @@ const ClientDashboard: React.FC = () => {
     window.open('https://wa.me/8891456134', '_blank', 'noopener,noreferrer');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-sky-50/20">
-        <Loader2 className="animate-spin text-sky-500" size={40} />
-                              <span className="text-sm font-semibold text-slate-600">Loading</span>
-
+if (loading) {
+  return (
+    <div className="flex items-center justify-center w-full h-full min-h-screen">
+      <div className="flex flex-row gap-2 ">
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

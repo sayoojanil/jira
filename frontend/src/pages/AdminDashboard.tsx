@@ -359,13 +359,17 @@ const AdminDashboard: React.FC = () => {
 );
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-slate-950 transition-colors duration-300">
-        <Spin size="large" />
+if (loading) {
+  return (
+    <div className="flex items-center justify-center w-full h-full min-h-screen">
+      <div className="flex flex-row gap-2 ">
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   const CHART_COLORS = ['#bae6fd', '#38bdf8', '#0284c7', '#10b981', '#fbbf24'];
 
@@ -414,7 +418,8 @@ const AdminDashboard: React.FC = () => {
     />
   ) : (
     <span className="font-bold text-lg text-sky-700">
-      {member.name[0]?.toUpperCase()}
+      <img src='https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg' className="h-full w-full object-cover"
+    />
     </span>
   )}
 </div>
@@ -813,7 +818,7 @@ const AdminDashboard: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddRequirement}
-                className="px-4 py-2 !bg-sky-700 text-white rounded-full font-semibold transition"
+                className="px-4 py-2 !bg-[#0055FF] text-white rounded-md font-semibold transition"
               >
                 Add
               </button>
@@ -840,14 +845,14 @@ const AdminDashboard: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-5 py-2.5 border border-slate-200 text-slate-500 rounded-xl hover:bg-slate-50 font-semibold text-sm transition"
+              className="px-5 py-2.5 border border-slate-200 text-slate-500 rounded-md hover:bg-slate-50 font-semibold text-sm transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={actionLoading}
-              className="px-5 py-2.5 rounded-full !bg-sky-700 hover:from-sky-600 hover:to-indigo-700 text-white font-semibold  disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-5 py-2.5 rounded-md !bg-[#0055FF] hover:from-sky-600 hover:to-indigo-700 text-white font-semibold  disabled:opacity-50 transition-all flex items-center gap-2"
             >
               {actionLoading ? <Loader2 className="animate-spin" size={16} /> : 'Create Project'}
             </button>
