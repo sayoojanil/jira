@@ -1515,13 +1515,21 @@ const ProjectDetails: React.FC = () => {
                           onClick={() => navigate(`/team-member/${member._id}`)}
                         >
                           <Avatar src={getFileUrl(member.profilePic)} className="h-8 w-8 md:h-10 md:w-10">
-                            {member.name?.[0]?.toUpperCase()}
+                            {/* {member.name?.[0]?.toUpperCase()} */}
+                            <img 
+                            src={
+                              member?.gender === 'Female'
+                                ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80'
+                                : 'https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'}
+                            className="block h-full w-full rounded-full object-cover" 
+                            alt="Default avatar" 
+                          />
                           </Avatar>
                           <div className="min-w-0">
-                            <div className="text-xs md:text-sm font-semibold text-slate-700 truncate">
+                            <div className="text-sm md:text-base font-semibold text-slate-700 truncate">
                               {member.name}
                             </div>
-                            <div className="text-[10px] text-slate-400 truncate">{member.email}</div>
+                            <div className="text-xs md:text-sm text-slate-400 truncate">{member.email}</div>
                           </div>
                         </div>
                       ))
