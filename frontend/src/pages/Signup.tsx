@@ -24,6 +24,7 @@ const Signup: React.FC = () => {
       name: '',
       email: '',
       password: '',
+      gender: '',
     },
   });
 
@@ -35,6 +36,7 @@ const Signup: React.FC = () => {
         email: data.email,
         password: data.password,
         role,
+        gender: data.gender,
       });
 
       const { token, ...user } = response.data;
@@ -154,6 +156,31 @@ const Signup: React.FC = () => {
                     Team Member
                   </button> */}
                 </div>
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+                  Gender
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <User size={18} />
+                  </div>
+                  <select
+                    {...register('gender', { required: 'Gender is required' })}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-sky-100/80 bg-white/50 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-all appearance-none"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+                {errors.gender && (
+                  <p className="text-xs text-rose-500 mt-1 font-medium">{errors.gender.message}</p>
+                )}
               </div>
 
               {/* Password */}

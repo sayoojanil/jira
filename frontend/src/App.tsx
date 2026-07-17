@@ -153,7 +153,7 @@ const App: React.FC = () => {
         <Route
           path="/profile"
           element={
-            <RoleGuard allowedRoles={['team_member']}>
+            <RoleGuard allowedRoles={['admin', 'client', 'team_member']}>
               <TeamMemberProfile />
             </RoleGuard>
           }

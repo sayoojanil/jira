@@ -13,7 +13,7 @@ router.use(protect);
 // @access  Private/Admin
 router.get('/clients', authorize('admin'), async (req, res) => {
   try {
-    const clients = await User.find({ role: 'client' }).select('name email');
+    const clients = await User.find({ role: 'client' }).select('name email gender');
     res.status(200).json({ success: true, data: clients });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -25,7 +25,7 @@ router.get('/clients', authorize('admin'), async (req, res) => {
 // @access  Private/Admin
 router.get('/team', authorize('admin'), async (req, res) => {
   try {
-    const team = await User.find({ role: 'team_member' }).select('name email position profilePic');
+    const team = await User.find({ role: 'team_member' }).select('name email position profilePic gender');
     res.status(200).json({ success: true, data: team });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

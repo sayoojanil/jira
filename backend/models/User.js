@@ -29,6 +29,11 @@ const UserSchema = new mongoose.Schema(
       enum: ['admin', 'client', 'team_member'],
       default: 'client',
     },
+    gender: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     bio: {
       type: String,
       trim: true,

@@ -363,9 +363,9 @@ if (loading) {
   return (
     <div className="flex items-center justify-center w-full h-full min-h-screen">
       <div className="flex flex-row gap-2 ">
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
     </div>
   );
@@ -417,9 +417,14 @@ if (loading) {
       className="h-full w-full object-cover"
     />
   ) : (
-    <span className="font-bold text-lg text-sky-700">
-      <img src='https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg' className="h-full w-full object-cover"
-    />
+    <span className="font-bold text-lg text-sky-700 w-full h-full">
+      <img 
+        src={member.gender === 'Female' 
+          ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80' 
+          : 'https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'} 
+        className="h-full w-full object-cover"
+        alt="Default avatar"
+      />
     </span>
   )}
 </div>

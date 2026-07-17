@@ -122,8 +122,8 @@ const getProjectBugs = async (req, res) => {
     }
 
     const bugs = await Bug.find({ project: projectId })
-      .populate('reporter', 'name email role profilePic')
-      .populate('comments.author', 'name email role profilePic')
+      .populate('reporter', 'name email role profilePic gender')
+      .populate('comments.author', 'name email role profilePic gender')
       .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, count: bugs.length, data: bugs });
@@ -234,8 +234,8 @@ const updateBug = async (req, res) => {
     }
 
     const updatedBug = await Bug.findById(bug._id)
-      .populate('reporter', 'name email role profilePic')
-      .populate('comments.author', 'name email role profilePic');
+      .populate('reporter', 'name email role profilePic gender')
+      .populate('comments.author', 'name email role profilePic gender');
 
     if (global.io) {
       global.io.to(bug.project.toString()).emit('bugUpdated', updatedBug);

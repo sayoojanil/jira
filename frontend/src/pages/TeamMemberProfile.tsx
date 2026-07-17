@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../store';
 import { authSuccess } from '../store/authSlice';
 import API, { getFileUrl } from '../utils/api';
-import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X, MoveLeft, MoveRight, MoveUp, MoveDown, ZoomIn, ZoomOut, Badge, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Camera, Phone, Briefcase, Mail, Pencil, X, MoveLeft, MoveRight, MoveUp, MoveDown, ZoomIn, ZoomOut, Badge, CheckCircle2, User } from 'lucide-react';
 import { Button, message, Tag, Input, Upload, Spin, Modal } from 'antd';
 
 const TeamMemberProfile: React.FC = () => {
@@ -237,9 +237,9 @@ if (loading) {
   return (
     <div className="flex items-center justify-center w-full h-full min-h-screen">
       <div className="flex flex-row gap-2 ">
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
     </div>
   );
@@ -278,10 +278,13 @@ if (loading) {
                     className="h-full w-full object-cover object-center"
                   />
                 ) : (
-                  <img src='https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'
-                  className="h-full w-full object-cover object-center"
-                  
-                />
+                  <img 
+                    src={profile?.gender === 'Female' 
+                      ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80' 
+                      : 'https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'}
+                    className="h-full w-full object-cover object-center"
+                    alt="Default avatar"
+                  />
                 )}
               </button>
               {isOwnProfile && (
@@ -459,6 +462,11 @@ if (loading) {
             </div>
 
             <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Gender (Cannot be changed)</label>
+              <Input value={profile?.gender || 'Not specified'} disabled size="large" />
+            </div>
+
+            <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bio</label>
               <Controller
                 name="bio"
@@ -533,6 +541,10 @@ if (loading) {
             <div className="flex items-center gap-3 text-sm">
               <Briefcase size={16} className="text-slate-400" />
               <span className="text-slate-700">{profile.position || 'Not specified'}</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <User size={16} className="text-slate-400" />
+              <span className="text-slate-700">{profile.gender || 'Not specified'}</span>
             </div>
           </div>
         </div>

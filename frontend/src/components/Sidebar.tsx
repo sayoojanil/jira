@@ -94,7 +94,13 @@ const Sidebar: React.FC = () => {
       />
     ) : (
       <div className="flex h-full w-full items-center justify-center font-bold text-sky-700">
-        {user?.name?.[0]?.toUpperCase() || "U"}
+        <img 
+          src={user?.gender === 'Female' 
+            ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80' 
+            : 'https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'} 
+          className="h-full w-full object-cover" 
+          alt="Default avatar" 
+        />
       </div>
     )}
   </div>

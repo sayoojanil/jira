@@ -186,22 +186,20 @@ const Navbar: React.FC = () => {
         </div>
       ),
     },
+    {
+      key: '2',
+      label: (
+        <button
+          onClick={() => navigate('/profile')}
+          className="w-full flex items-center gap-2 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 rounded-lg transition"
+        >
+          <UserIcon size={16} />
+          <span>My Profile</span>
+        </button>
+      ),
+    },
     ...(user?.role === 'team_member'
       ? [
-          {
-            key: '2',
-            label: (
-              <button
-                onClick={() => navigate('/profile')}
-                className="w-full flex items-center gap-2 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 rounded-lg transition"
-              >
-                <UserIcon size={16} />
-                <span>My Profile</span>
-                
-              </button>
-              
-            ),
-          },
           {
   key: 'settings',
   label: (
@@ -259,16 +257,16 @@ const Navbar: React.FC = () => {
   
 
   return (
-    <nav className="glass-panel sticky top-3 z-40 mx-3 mt-3 flex items-center justify-between rounded-full border border-white/70 px-5 py-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.2)] sm:px-6">
+    <nav className="glass-panel sticky top-3 z-40 mx-3 mt-3 flex items-center justify-between rounded-md border border-white/70 px-5 py-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.2)] sm:px-6">
       {/* Brand logo */}
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
         <div>
           <span className="font-bold text-lg tracking-tight text-sky-700">
             TaskFlow
           </span>
-          <span className="hidden sm:inline-block ml-2 rounded-full bg-sky-100/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-700 capitalize">
+          {/* <span className="hidden sm:inline-block ml-2 rounded-full bg-sky-100/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-700 capitalize">
             {user?.role?.replace('_', ' ')} Panel
-          </span>
+          </span> */}
         </div>
       </div>
 
@@ -314,7 +312,13 @@ const Navbar: React.FC = () => {
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center font-bold text-sky-700">
-          {user?.name?.[0]?.toUpperCase() || 'U'}
+          <img 
+            src={user?.gender === 'Female' 
+              ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80' 
+              : 'https://st.depositphotos.com/2101611/3925/v/450/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg'} 
+            className="block h-full w-full rounded-full object-cover" 
+            alt="Default avatar" 
+          />
         </div>
       )}
     </div>

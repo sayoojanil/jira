@@ -194,3 +194,55 @@
 .ant-message .ant-message-notice {
   animation: antMessageSlideFromBottom 0.3s ease-out;
 }
+
+   
+        .jira-bug-modal .ant-modal-content {
+          padding: 0;
+          border-radius: 12px;
+          overflow: hidden;
+          background: #f7f8fa;
+        }
+
+        .jira-bug-modal .ant-modal-header {
+          display: none;
+        }
+
+        .jira-bug-modal .ant-modal-close {
+          top: 16px;
+          right: 16px;
+          z-index: 10;
+        }
+
+        .jira-tabs .ant-tabs-nav {
+          margin-bottom: 16px;
+        }
+
+        .jira-tabs .ant-tabs-tab {
+          font-size: 13px;
+          padding: 8px 0;
+          margin-right: 24px;
+        }
+
+        .jira-tabs .ant-tabs-tab-active {
+          font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+          .jira-bug-modal .ant-modal-body {
+            padding: 0;
+          }
+          
+          .jira-bug-modal .ant-modal-content {
+            border-radius: 0;
+            height: 100vh;
+            max-height: 100vh;
+          }
+          
+          .jira-bug-modal {
+            max-width: 100% !important;
+            margin: 0 !important;
+            top: 0 !important;
+            padding: 0 !important;
+          }
+        }
+    

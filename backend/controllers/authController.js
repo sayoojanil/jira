@@ -28,7 +28,7 @@ const generateToken = (id) => {
 // @access  Public
 const signup = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, gender } = req.body;
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -42,6 +42,7 @@ const signup = async (req, res) => {
       email,
       password,
       role: role || 'client', // Default to client if not specified
+      gender: gender || '',
     });
 
     if (user) {
@@ -51,6 +52,7 @@ const signup = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        gender: user.gender || '',
         profilePic: user.profilePic || '',
         token: generateToken(user._id),
       });
@@ -87,6 +89,7 @@ const login = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      gender: user.gender || '',
       profilePic: user.profilePic || '',
       token: generateToken(user._id),
     });

@@ -116,7 +116,7 @@ const getProjects = async (req, res) => {
     const projects = await Project.find(query)
       .populate('client', 'name email')
       .populate('assignedClients', 'name email')
-      .populate('assignedTeam', 'name email profilePic');
+      .populate('assignedTeam', 'name email profilePic gender');
 
     res.status(200).json({ success: true, count: projects.length, data: projects });
   } catch (error) {
@@ -132,7 +132,7 @@ const getProjectById = async (req, res) => {
     const project = await Project.findById(req.params.id)
       .populate('client', 'name email')
       .populate('assignedClients', 'name email')
-      .populate('assignedTeam', 'name email profilePic');
+      .populate('assignedTeam', 'name email profilePic gender');
 
     if (!project) {
       return res.status(404).json({ success: false, message: 'Project not found' });
@@ -166,7 +166,7 @@ const redeemProjectToken = async (req, res) => {
     const project = await Project.findOne({ secureToken: token })
       .populate('client', 'name email')
       .populate('assignedClients', 'name email')
-      .populate('assignedTeam', 'name email profilePic');
+      .populate('assignedTeam', 'name email profilePic gender');
 
     if (!project) {
       return res.status(404).json({ success: false, message: 'Invalid project access link' });
@@ -337,7 +337,7 @@ const updateProject = async (req, res) => {
     const updatedProject = await Project.findById(project._id)
       .populate('client', 'name email')
       .populate('assignedClients', 'name email')
-      .populate('assignedTeam', 'name email');
+      .populate('assignedTeam', 'name email profilePic gender');
 
     // Notify connected clients via global socket if required (handled globally or via events emitter)
     if (global.io) {
@@ -378,7 +378,7 @@ const downloadInvoice = async (req, res) => {
     const project = await Project.findById(req.params.id)
       .populate('client', 'name email')
       .populate('assignedClients', 'name email')
-      .populate('assignedTeam', 'name email');
+      .populate('assignedTeam', 'name email profilePic gender');
 
     if (!project) {
       return res.status(404).json({ success: false, message: 'Project not found' });

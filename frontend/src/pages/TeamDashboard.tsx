@@ -98,9 +98,9 @@ if (loading) {
   return (
     <div className="flex items-center justify-center w-full h-full min-h-screen">
       <div className="flex flex-row gap-2 ">
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce"></div>
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
-        <div className="w-4 h-4 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-2 h-2 rounded-full bg-[#0055FF] animate-bounce [animation-delay:-.5s]"></div>
       </div>
     </div>
   );
@@ -187,7 +187,13 @@ if (loading) {
                       {p.assignedTeam?.length > 0 && p.assignedTeam.map((member: any) => (
                         <Avatar
                           key={member._id}
-                          src={member.profilePic ? getFileUrl(member.profilePic) : undefined}
+                          src={
+                            member.profilePic
+                              ? getFileUrl(member.profilePic)
+                              : member.gender === 'Female'
+                              ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80'
+                              : undefined
+                          }
                           className="border-2 border-white"
                         >
                           {member.name?.[0]?.toUpperCase()}
