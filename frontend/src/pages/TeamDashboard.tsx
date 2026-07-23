@@ -153,11 +153,11 @@ if (loading) {
               <GlassCard
                 key={p._id}
                 onClick={() => navigate(`/project/${p._id}`)}
-                className="border border-sky-100/40 p-6 flex flex-col justify-between"
+                className="border shadow-xl border-sky-100/40 p-6 flex flex-col justify-between rounded-none"
               >
                 <div>
                   <div className="flex justify-between items-start gap-4">
-                    <h3 className="font-bold text-lg text-slate-800 truncate">{p.name}</h3>
+                    <h3 className="font-bold text-xl text-slate-800 truncate">{p.name}</h3>
                     <Tag
                       color={getStatusColor(p.status)}
                       className="flex items-center gap-1 border-0"
@@ -166,7 +166,7 @@ if (loading) {
                       <span>{p.status}</span>
                     </Tag>
                   </div>
-                  <p className="text-slate-500 text-xs mt-2 line-clamp-2">{p.description}</p>
+                  <p className="text-slate-500 text-sm mt-2 line-clamp-2">{p.description}</p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-sky-100/20 space-y-4">
@@ -183,23 +183,32 @@ if (loading) {
                       <Calendar size={11} className="text-slate-700" />
                       <span className='text-slate-600 font-semibold'>Deadline: {moment(p.deadline).format('MMMM DD, YYYY')}</span>
                     </span>
-                    <div className="flex -space-x-2 mt-2">
-                      {p.assignedTeam?.length > 0 && p.assignedTeam.map((member: any) => (
-                        <Avatar
-                          key={member._id}
-                          src={
-                            member.profilePic
-                              ? getFileUrl(member.profilePic)
-                              : member.gender === 'Female'
-                              ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80'
-                              : undefined
-                          }
-                          className="border-2 border-white"
-                        >
-                          {member.name?.[0]?.toUpperCase()}
-                        </Avatar>
-                      ))}
-                    </div>
+                   <div className="flex -space-x-2 mt-2">
+  {p.assignedTeam?.length > 0 && (
+    <>
+      {/* Show only the first avatar */}
+      <Avatar
+        src={
+          p.assignedTeam[0].profilePic
+            ? getFileUrl(p.assignedTeam[0].profilePic)
+            : p.assignedTeam[0].gender === "Female"
+            ? "https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80"
+            : undefined
+        }
+        className="border-2 border-white"
+      >
+        {p.assignedTeam[0].name?.[0]?.toUpperCase()}
+      </Avatar>
+
+      {/* Show +N if more members exist */}
+      {p.assignedTeam.length > 1 && (
+        <div className="w-9 h-9 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-sm font-semibold text-gray-700">
+          +{p.assignedTeam.length - 1}
+        </div>
+      )}
+    </>
+  )}
+</div>
                     <span className="flex items-center gap-0.5 text-sky-600 text-sm font-semibold">
                       <span>View Workspace</span>
                       <ChevronRight size={12} />
