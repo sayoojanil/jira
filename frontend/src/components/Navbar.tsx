@@ -261,9 +261,9 @@ const Navbar: React.FC = () => {
       {/* Brand logo */}
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
         <div>
-          <span className="font-bold text-lg tracking-tight text-sky-700">
+          {/* <span className="font-bold text-lg tracking-tight text-sky-700">
             TaskFlow
-          </span>
+          </span> */}
           {/* <span className="hidden sm:inline-block ml-2 rounded-full bg-sky-100/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-700 capitalize">
             {user?.role?.replace('_', ' ')} Panel
           </span> */}
