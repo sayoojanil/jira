@@ -7,6 +7,7 @@ export interface User {
   profilePic: string;
   role: 'admin' | 'client' | 'team_member';
   token?: string;
+  gender?: 'Female' | 'Male' | 'Other';
 }
 
 interface AuthState {
