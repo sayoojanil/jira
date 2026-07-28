@@ -71,6 +71,22 @@ const { TabPane } = Tabs;
 const { TextArea } = Input;
 const { Option } = Select;
 
+// Comment interface
+interface Comment {
+  _id?: string;
+  content: string;
+  author: {
+    _id: string;
+    name: string;
+    role: string;
+    profilePic?: string;
+    gender?: string;
+  };
+  attachments?: string[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
 // Jira-style Bug Details Modal Component
 const JiraBugDetailsModal: React.FC<{
   activeBug: any;
@@ -102,6 +118,9 @@ const JiraBugDetailsModal: React.FC<{
   const [activeTab, setActiveTab] = useState('1');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentContent, setEditingCommentContent] = useState('');
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeBug) {
@@ -110,6 +129,47 @@ const JiraBugDetailsModal: React.FC<{
   }, [activeBug]);
 
   if (!activeBug) return null;
+
+  // Helper function to check if user can edit/delete comment
+  const canModifyComment = (comment: Comment) => {
+    if (!user) return false;
+    // Admin can modify any comment
+    if (user.role === 'admin') return true;
+    // Team member can modify their own comments
+    if (user.role === 'team_member' && comment.author._id === user._id) return true;
+    return false;
+  };
+
+  // Handle comment edit
+  const handleEditComment = async (commentId: string, content: string) => {
+    if (!activeBug) return;
+    try {
+      const response = await API.put(`/bugs/${activeBug._id}/comments/${commentId}`, { content });
+      setActiveBug(response.data.data);
+      setEditingCommentId(null);
+      setEditingCommentContent('');
+      message.success('Comment updated successfully');
+    } catch (err: any) {
+      message.error(err.response?.data?.message || 'Failed to update comment');
+    }
+  };
+
+  // Handle comment delete
+  const handleDeleteComment = async (commentId: string) => {
+    if (!activeBug) return;
+    if (!window.confirm('Are you sure you want to delete this comment?')) return;
+    
+    try {
+      setDeletingCommentId(commentId);
+      const response = await API.delete(`/bugs/${activeBug._id}/comments/${commentId}`);
+      setActiveBug(response.data.data);
+      message.success('Comment deleted successfully');
+    } catch (err: any) {
+      message.error(err.response?.data?.message || 'Failed to delete comment');
+    } finally {
+      setDeletingCommentId(null);
+    }
+  };
 
   const getPriorityConfig = (priority: string) => {
     const configs = {
@@ -158,16 +218,16 @@ const JiraBugDetailsModal: React.FC<{
     >
       <div className="flex flex-col lg:flex-row min-h-[600px] max-h-[90vh] bg-gray-50">
         {/* Main Content - Left side */}
-        <div className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 overflow-y-auto">
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-4 sm:mb-6">
             <div className="flex-1 mr-4">
               {isEditingTitle ? (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Input
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    className="text-xl font-bold"
+                    className="text-base sm:text-lg md:text-xl font-bold"
                     onPressEnter={handleSaveTitle}
                     autoFocus
                   />
@@ -185,13 +245,15 @@ const JiraBugDetailsModal: React.FC<{
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2 sm:gap-3">
                   <div className="mt-1">
-                    <Bug className="w-5 h-5 text-red-500" />
+                    <Bug className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-1">{activeBug.title}</h2>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
+                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1 break-words">
+                      {activeBug.title}
+                    </h2>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
                       <span className="flex items-center gap-1">
                         <User size={12} />
                         {activeBug.reporter?.name || 'Unknown'}
@@ -201,7 +263,7 @@ const JiraBugDetailsModal: React.FC<{
                         <Clock size={12} />
                         {moment(activeBug.createdAt).format('MMM D, YYYY')}
                       </span>
-                      <span className="hidden sm:flex items-center gap-1">
+                      <span className="flex items-center gap-1">
                         <RefreshCw size={12} />
                         Updated {moment(activeBug.updatedAt).fromNow()}
                       </span>
@@ -210,47 +272,47 @@ const JiraBugDetailsModal: React.FC<{
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button
                 type="text"
                 icon={<Edit3 size={16} />}
                 className="text-gray-500"
                 onClick={() => setIsEditingTitle(true)}
               >
-                Edit
+                <span className="hidden sm:inline">Edit</span>
               </Button>
               <Button type="text" icon={<MoreVertical size={16} />} className="text-gray-500" />
             </div>
           </div>
 
-          {/* Status & Priority Badges */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
+          {/* Status & Priority Badges - Responsive */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500">Status</span>
+              <span className="text-xs font-medium text-gray-500 hidden sm:inline">Status</span>
               <Select
                 value={bugStatusUpdate || activeBug.status}
                 onChange={(value) => {
                   setBugStatusUpdate(value);
                   handleStatusChange(activeBug._id, value);
                 }}
-                className="w-32"
+                className="w-28 sm:w-32"
                 size="small"
               >
                 {statusOptions.map((status) => (
                   <Option key={status} value={status}>
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${getStatusConfig(status).dotColor}`} />
-                      {status}
+                      <span className="text-xs">{status}</span>
                     </div>
                   </Option>
                 ))}
               </Select>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500">Priority</span>
+              <span className="text-xs font-medium text-gray-500 hidden sm:inline">Priority</span>
               <Select
                 value={activeBug.priority}
-                className="w-28"
+                className="w-24 sm:w-28"
                 size="small"
                 onChange={async (value) => {
                   try {
@@ -266,7 +328,7 @@ const JiraBugDetailsModal: React.FC<{
                   <Option key={priority} value={priority}>
                     <div className="flex items-center gap-2">
                       {getPriorityConfig(priority).icon}
-                      {priority}
+                      <span className="text-xs">{priority}</span>
                     </div>
                   </Option>
                 ))}
@@ -275,8 +337,8 @@ const JiraBugDetailsModal: React.FC<{
           </div>
 
           {/* Description */}
-          <div className="mb-6">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="mb-4 sm:mb-6">
+            <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-sm font-semibold text-gray-700">Description</h4>
                 <Button
@@ -288,7 +350,7 @@ const JiraBugDetailsModal: React.FC<{
                   Edit
                 </Button>
               </div>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
                 {activeBug.description || 'No description provided.'}
               </p>
             </div>
@@ -298,17 +360,17 @@ const JiraBugDetailsModal: React.FC<{
           <Tabs activeKey={activeTab} onChange={setActiveTab} className="jira-tabs">
             <TabPane
               tab={
-                <span className="flex items-center gap-2">
-                  <MessageSquare size={16} /> Comments
+                <span className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <MessageSquare size={14} className="sm:w-4 sm:h-4" /> Comments
                 </span>
               }
               key="1"
             >
               {/* Comments Section */}
               <div className="space-y-4 mt-4">
-                {/* Add Comment */}
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
-                  <div className="flex items-start gap-3">
+                {/* Add Comment - Responsive */}
+                <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4">
+                  <div className="flex items-start gap-2 sm:gap-3">
                     <Avatar
                       src={
                         user?.profilePic
@@ -317,17 +379,17 @@ const JiraBugDetailsModal: React.FC<{
                           ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80'
                           : undefined
                       }
-                      className="w-8 h-8"
+                      className="w-6 h-6 sm:w-8 sm:h-8"
                     >
                       {user?.name?.[0]?.toUpperCase()}
                     </Avatar>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <TextArea
                         value={bugComment}
                         onChange={(e) => setBugComment(e.target.value)}
                         placeholder="Add a comment..."
                         rows={3}
-                        className="rounded-lg resize-none"
+                        className="rounded-lg resize-none text-sm"
                         onPressEnter={(e) => {
                           if (!e.shiftKey) {
                             e.preventDefault();
@@ -338,20 +400,33 @@ const JiraBugDetailsModal: React.FC<{
                         }}
                       />
 
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <label className="cursor-pointer">
                             <input
                               type="file"
                               multiple
                               accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
-                              onChange={(e) => setBugCommentFiles(e.target.files)}
+                              onChange={(e) => {
+                                setBugCommentFiles(e.target.files);
+                                if (e.target.files && e.target.files.length > 0) {
+                                  message.success(`${e.target.files.length} file(s) selected`);
+                                }
+                              }}
                               className="hidden"
+                              id="bug-attachment-input"
                             />
                             <Button
                               size="small"
                               icon={<Paperclip size={14} />}
                               className="text-gray-500"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const fileInput = document.getElementById('bug-attachment-input') as HTMLInputElement;
+                                if (fileInput) {
+                                  fileInput.click();
+                                }
+                              }}
                             >
                               Attach
                             </Button>
@@ -371,19 +446,19 @@ const JiraBugDetailsModal: React.FC<{
                           className="bg-blue-600 hover:bg-blue-700"
                         >
                           <Send size={14} />
-                          <span className="ml-1">Send</span>
+                          <span className="ml-1 hidden sm:inline">Send</span>
                         </Button>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Comment List */}
-                <div className="space-y-4">
+                {/* Comment List - Responsive with Edit/Delete */}
+                <div className="space-y-3 sm:space-y-4">
                   {activeBug.comments && activeBug.comments.length > 0 ? (
-                    activeBug.comments.map((comment: any, idx: number) => (
-                      <div key={idx} className="bg-white rounded-lg border border-gray-200 p-4">
-                        <div className="flex items-start gap-3">
+                    activeBug.comments.map((comment: Comment, idx: number) => (
+                      <div key={idx} className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4">
+                        <div className="flex items-start gap-2 sm:gap-3">
                           <Avatar
                             src={
                               comment.author?.profilePic
@@ -392,29 +467,61 @@ const JiraBugDetailsModal: React.FC<{
                                 ? 'https://img.magnific.com/free-vector/flat-style-woman-avatar_90220-2944.jpg?semt=ais_hybrid&w=740&q=80'
                                 : undefined
                             }
-                            className="w-8 h-8"
+                            className="w-6 h-6 sm:w-8 sm:h-8 shrink-0"
                           >
                             {comment.author?.name?.[0]?.toUpperCase()}
                           </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-sm text-gray-900">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center justify-between gap-1 sm:gap-2 mb-1">
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                                <span className="font-semibold text-xs sm:text-sm text-gray-900 break-words">
                                   {comment.author?.name}
                                 </span>
-                                <span className="text-xs text-gray-400">
+                                <span className="text-[10px] sm:text-xs text-gray-400">
                                   {comment.author?.role}
                                 </span>
                               </div>
-                              <span className="text-xs text-gray-400">
+                              <span className="text-[10px] sm:text-xs text-gray-400 shrink-0">
                                 {moment(comment.createdAt).fromNow()}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                              {comment.content}
-                            </p>
+                            
+                            {editingCommentId === comment._id ? (
+                              <div className="space-y-2">
+                                <TextArea
+                                  value={editingCommentContent}
+                                  onChange={(e) => setEditingCommentContent(e.target.value)}
+                                  rows={2}
+                                  className="rounded-lg text-sm"
+                                  autoFocus
+                                />
+                                <div className="flex flex-wrap gap-2">
+                                  <Button
+                                    size="small"
+                                    type="primary"
+                                    onClick={() => handleEditComment(comment._id!, editingCommentContent)}
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    onClick={() => {
+                                      setEditingCommentId(null);
+                                      setEditingCommentContent('');
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-xs sm:text-sm text-gray-700 whitespace-pre-wrap break-words">
+                                {comment.content}
+                              </p>
+                            )}
+
                             {comment.attachments && comment.attachments.length > 0 && (
-                              <div className="mt-3 grid grid-cols-3 gap-2">
+                              <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 {comment.attachments.map((attachment: string, attIdx: number) => {
                                   const fileUrl = getFileUrl(attachment) || '';
                                   const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(fileUrl);
@@ -431,11 +538,11 @@ const JiraBugDetailsModal: React.FC<{
                                         <img
                                           src={fileUrl}
                                           alt="Attachment"
-                                          className="w-full h-24 object-cover"
+                                          className="w-full h-16 sm:h-24 object-cover"
                                         />
                                       ) : (
-                                        <div className="flex items-center gap-2 p-3 bg-gray-50">
-                                          {/* <File size={16} className="text-gray-400"/> */}
+                                        <div className="flex items-center gap-2 p-2 sm:p-3 bg-gray-50">
+                                          <File size={14} className="text-gray-400" />
                                           <span className="text-xs text-gray-600 truncate">
                                             Attachment {attIdx + 1}
                                           </span>
@@ -444,6 +551,34 @@ const JiraBugDetailsModal: React.FC<{
                                     </a>
                                   );
                                 })}
+                              </div>
+                            )}
+
+                            {/* Edit/Delete Actions */}
+                            {canModifyComment(comment) && !editingCommentId && (
+                              <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                                <Button
+                                  size="small"
+                                  type="text"
+                                  icon={<Edit3 size={12} />}
+                                  className="text-gray-500 hover:text-blue-600 text-xs"
+                                  onClick={() => {
+                                    setEditingCommentId(comment._id!);
+                                    setEditingCommentContent(comment.content);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="small"
+                                  type="text"
+                                  icon={<Trash2 size={12} />}
+                                  className="text-gray-500 hover:text-red-600 text-xs"
+                                  onClick={() => handleDeleteComment(comment._id!)}
+                                  loading={deletingCommentId === comment._id}
+                                >
+                                  Delete
+                                </Button>
                               </div>
                             )}
                           </div>
@@ -461,8 +596,8 @@ const JiraBugDetailsModal: React.FC<{
 
             <TabPane
               tab={
-                <span className="flex items-center gap-2">
-                  <Activity size={16} /> Activity
+                <span className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <Activity size={14} className="sm:w-4 sm:h-4" /> Activity
                 </span>
               }
               key="2"
@@ -496,9 +631,9 @@ const JiraBugDetailsModal: React.FC<{
           </Tabs>
         </div>
 
-        {/* Sidebar - Right side */}
-        <div className="lg:w-80 bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto">
-          <div className="space-y-6">
+        {/* Sidebar - Right side - Responsive */}
+        <div className="lg:w-80 bg-gray-50 border-l border-gray-200 p-4 sm:p-6 overflow-y-auto">
+          <div className="space-y-4 sm:space-y-6">
             {/* Assignees */}
             <div>
               <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
@@ -515,28 +650,28 @@ const JiraBugDetailsModal: React.FC<{
                 >
                   {activeBug.assignee?.name?.[0]?.toUpperCase() || '?'}
                 </Avatar>
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-700 break-words">
                   {activeBug.assignee?.name || 'Unassigned'}
                 </span>
                 <Button
                   type="text"
                   icon={<UserPlus size={14} />}
-                  className="ml-auto text-gray-400"
+                  className="ml-auto text-gray-400 shrink-0"
                   size="small"
                 />
               </div>
             </div>
 
-            <Divider className="my-4" />
+            <Divider className="my-3 sm:my-4" />
 
             {/* Details */}
             <div>
               <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
                 Details
               </h4>
-              <div className="space-y-3">
-                <div className="flex justify-between items-start">
-                  <span className="text-xs text-gray-500">Status</span>
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex flex-wrap justify-between items-start gap-1">
+                  <span className="text-xs text-gray-500 shrink-0">Status</span>
                   <Tag color={getStatusConfig(activeBug.status).color} className="text-xs">
                     <span
                       className={`w-1.5 h-1.5 rounded-full ${getStatusConfig(activeBug.status).dotColor} inline-block mr-1`}
@@ -544,35 +679,37 @@ const JiraBugDetailsModal: React.FC<{
                     {activeBug.status}
                   </Tag>
                 </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-xs text-gray-500">Priority</span>
+                <div className="flex flex-wrap justify-between items-start gap-1">
+                  <span className="text-xs text-gray-500 shrink-0">Priority</span>
                   <Tag color={getPriorityConfig(activeBug.priority).color} className="text-xs">
                     {getPriorityConfig(activeBug.priority).icon}
                     <span className="ml-1">{activeBug.priority}</span>
                   </Tag>
                 </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-xs text-gray-500">Project</span>
-                  <span className="text-xs text-gray-700">{activeBug.project?.name || 'N/A'}</span>
+                <div className="flex flex-wrap justify-between items-start gap-1">
+                  <span className="text-xs text-gray-500 shrink-0">Project</span>
+                  <span className="text-xs text-gray-700 break-words text-right">
+                    {activeBug.project?.name || 'N/A'}
+                  </span>
                 </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-xs text-gray-500">Created</span>
-                  <span className="text-xs text-gray-700">
+                <div className="flex flex-wrap justify-between items-start gap-1">
+                  <span className="text-xs text-gray-500 shrink-0">Created</span>
+                  <span className="text-xs text-gray-700 text-right">
                     {moment(activeBug.createdAt).format('MMM D, YYYY HH:mm')}
                   </span>
                 </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-xs text-gray-500">Updated</span>
-                  <span className="text-xs text-gray-700">
+                <div className="flex flex-wrap justify-between items-start gap-1">
+                  <span className="text-xs text-gray-500 shrink-0">Updated</span>
+                  <span className="text-xs text-gray-700 text-right">
                     {moment(activeBug.updatedAt).format('MMM D, YYYY HH:mm')}
                   </span>
                 </div>
               </div>
             </div>
 
-            <Divider className="my-4" />
+            <Divider className="my-3 sm:my-4" />
 
-            {/* Attachments */}
+            {/* Attachments - Responsive */}
             {activeBug.screenshots && activeBug.screenshots.length > 0 && (
               <div>
                 <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
@@ -596,22 +733,22 @@ const JiraBugDetailsModal: React.FC<{
                           <img
                             src={fileUrl}
                             alt={`Attachment ${idx + 1}`}
-                            className="w-full h-24 object-cover"
+                            className="w-full h-20 sm:h-24 object-cover"
                           />
                         ) : isVideo ? (
-                          <div className="relative w-full h-24 bg-gray-900 flex items-center justify-center">
+                          <div className="relative w-full h-20 sm:h-24 bg-gray-900 flex items-center justify-center">
                             <video src={fileUrl} className="w-full h-full object-cover" muted />
                             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                              <PlayCircle className="w-8 h-8 text-white" />
+                              <PlayCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 p-3 bg-gray-50">
-                            <File size={16} className="text-gray-400" />
+                          <div className="flex items-center gap-2 p-2 sm:p-3 bg-gray-50">
+                            <File size={14} className="text-gray-400" />
                             <span className="text-xs text-gray-600 truncate">
                               Attachment {idx + 1}
                             </span>
-                            <Download size={14} className="ml-auto text-gray-400" />
+                            <Download size={14} className="ml-auto text-gray-400 shrink-0" />
                           </div>
                         )}
                       </a>
@@ -622,12 +759,12 @@ const JiraBugDetailsModal: React.FC<{
             )}
 
             {/* Quick Actions */}
-            <Divider className="my-4" />
+            <Divider className="my-3 sm:my-4" />
             <div className="space-y-2">
-              <Button block className="text-gray-600" icon={<Link2 size={14} />}>
+              <Button block className="text-gray-600 text-sm" icon={<Link2 size={14} />}>
                 Copy Link
               </Button>
-              <Button block className="text-gray-600" icon={<GitBranch size={14} />}>
+              <Button block className="text-gray-600 text-sm" icon={<GitBranch size={14} />}>
                 Create Branch
               </Button>
             </div>
@@ -1946,9 +2083,6 @@ const ProjectDetails: React.FC = () => {
           </div>
         </Modal>
       </div>
-
-      {/* Global CSS for Jira modal */}
-   
     </div>
   );
 };
