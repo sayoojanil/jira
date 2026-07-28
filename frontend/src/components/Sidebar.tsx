@@ -28,6 +28,11 @@ const Sidebar: React.FC = () => {
             label: 'Latest Project Links',
             icon: <LinkIcon size={18} />,
           },
+            {
+            to: '/admin/links',
+            label: 'Team Members',
+            icon: <LinkIcon size={18} />,
+          },
         ];
       case 'team_member':
         return [
@@ -80,8 +85,8 @@ const Sidebar: React.FC = () => {
   const navLinks = getLinks();
 
   return (
-    <aside className=" hidden w-72 shrink-0 flex-col gap-6 rounded-[28px] border border-white/70 p-5 shadow-lg md:flex md:min-h-[calc(100vh-96px)]">
-      <div className="flex flex-col items-center gap-2 border-b border-sky-100/40 pb-6">
+    <aside className=" hidden w-72 shrink-0 flex-col gap-6 rounded-[28px] borde p-5 shadow-lg md:flex md:min-h-[calc(100vh-96px)]">
+      <div className="flex flex-col items-center gap-2 border-b pb-6">
        <div className="mt-2 flex items-center gap-3">
   {/* Profile Photo */}
   <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full ">
