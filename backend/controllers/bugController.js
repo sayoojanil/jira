@@ -247,8 +247,93 @@ const updateBug = async (req, res) => {
   }
 };
 
+// @desc    Edit a specific comment on a bug
+// @route   PUT /api/bugs/:id/comments/:commentId
+// @access  Private (admin: any comment; client/team_member: own comments only)
+const editComment = async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const { content } = req.body;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ success: false, message: 'Comment content cannot be empty' });
+    }
+
+    const bug = await Bug.findById(id);
+    if (!bug) {
+      return res.status(404).json({ success: false, message: 'Bug not found' });
+    }
+
+    const comment = bug.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: 'Comment not found' });
+    }
+
+    // Authorization: admin can edit any comment; others can only edit their own
+    if (req.user.role !== 'admin' && comment.author.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to edit this comment' });
+    }
+
+    comment.content = content.trim();
+    await bug.save();
+
+    const updatedBug = await Bug.findById(id)
+      .populate('reporter', 'name email role profilePic gender')
+      .populate('comments.author', 'name email role profilePic gender');
+
+    if (global.io) {
+      global.io.to(bug.project.toString()).emit('bugUpdated', updatedBug);
+    }
+
+    res.status(200).json({ success: true, data: updatedBug });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Delete a specific comment on a bug
+// @route   DELETE /api/bugs/:id/comments/:commentId
+// @access  Private (admin: any comment; client/team_member: own comments only)
+const deleteComment = async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+
+    const bug = await Bug.findById(id);
+    if (!bug) {
+      return res.status(404).json({ success: false, message: 'Bug not found' });
+    }
+
+    const comment = bug.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: 'Comment not found' });
+    }
+
+    // Authorization: admin can delete any comment; others can only delete their own
+    if (req.user.role !== 'admin' && comment.author.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to delete this comment' });
+    }
+
+    bug.comments.pull({ _id: commentId });
+    await bug.save();
+
+    const updatedBug = await Bug.findById(id)
+      .populate('reporter', 'name email role profilePic gender')
+      .populate('comments.author', 'name email role profilePic gender');
+
+    if (global.io) {
+      global.io.to(bug.project.toString()).emit('bugUpdated', updatedBug);
+    }
+
+    res.status(200).json({ success: true, data: updatedBug });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   reportBug,
   getProjectBugs,
   updateBug,
+  editComment,
+  deleteComment,
 };

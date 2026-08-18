@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import API, { getFileUrl } from '../utils/api';
@@ -135,8 +136,11 @@ const JiraBugDetailsModal: React.FC<{
     if (!user) return false;
     // Admin can modify any comment
     if (user.role === 'admin') return true;
-    // Team member can modify their own comments
-    if (user.role === 'team_member' && comment.author._id === user._id) return true;
+    // Team member and client can modify their own comments
+    if (
+      (user.role === 'team_member' || user.role === 'client') &&
+      comment.author._id === user._id
+    ) return true;
     return false;
   };
 
@@ -1816,24 +1820,62 @@ const ProjectDetails: React.FC = () => {
                 </button>
               </div>
 
-              {/* Bugs List */}
-              <div className="space-y-3">
+              {/* Bugs List - mobile-friendly cards */}
+              <div className="space-y-2.5 sm:space-y-3">
                 {bugs.length > 0 ? (
                   bugs.map((bug) => (
                     <div
                       key={bug._id}
                       onClick={() => setActiveBug(bug)}
-                      className="flex items-center justify-between p-4 bg-white/80 rounded-xl border border-sky-100/30 hover:border-sky-300 hover:shadow-md transition cursor-pointer group"
+                      className="bg-white/90 rounded-xl border border-sky-100/40 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition cursor-pointer group p-3 sm:p-4"
                     >
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <Bug className="w-4 h-4 text-red-500 shrink-0" />
-                        <span className="font-medium text-sm text-slate-700 truncate">{bug.title}</span>
+                      {/* Top row: icon + title + chevron */}
+                      <div className="flex items-start gap-2.5 sm:gap-3">
+                        <div className="mt-0.5 shrink-0 h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-rose-50 flex items-center justify-center">
+                          <Bug className="w-4 h-4 text-rose-500" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-sm text-slate-800 leading-snug line-clamp-2 group-hover:text-sky-700 transition">
+                            {bug.title}
+                          </h4>
+                          {/* Meta row */}
+                          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs text-slate-400">
+                            {bug.reporter?.name && (
+                              <span className="flex items-center gap-1 truncate max-w-[120px] sm:max-w-none">
+                                <User size={11} className="shrink-0" />
+                                {bug.reporter.name}
+                              </span>
+                            )}
+                            {bug.createdAt && (
+                              <span className="flex items-center gap-1">
+                                <Clock size={11} className="shrink-0" />
+                                {moment(bug.createdAt).fromNow()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronLeft className="w-4 h-4 text-slate-300 rotate-180 group-hover:text-sky-500 transition shrink-0 mt-1 hidden sm:block" />
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Tag color={getBugStatusColor(bug.status)} className="text-[10px] m-0">
+
+                      {/* Bottom row: status + priority badges — always aligned */}
+                      <div className="mt-2.5 sm:mt-3 pt-2.5 border-t border-slate-100/80 flex flex-wrap items-center gap-2">
+                        <Tag
+                          color={getBugStatusColor(bug.status)}
+                          className="text-[10px] m-0 leading-none px-2 py-0.5 rounded-md"
+                        >
                           {bug.status}
                         </Tag>
-                        <ChevronLeft className="w-4 h-4 text-slate-400 rotate-180 group-hover:text-sky-500 transition" />
+                        <Tag
+                          color={getPriorityColor(bug.priority)}
+                          className="text-[10px] m-0 leading-none px-2 py-0.5 rounded-md"
+                        >
+                          {bug.priority || 'Medium'}
+                        </Tag>
+                        {/* Mobile-only chevron hint */}
+                        <span className="ml-auto sm:hidden text-[10px] text-slate-400 font-medium flex items-center gap-0.5">
+                          View
+                          <ChevronLeft className="w-3 h-3 rotate-180" />
+                        </span>
                       </div>
                     </div>
                   ))

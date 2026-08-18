@@ -1,5 +1,5 @@
 const express = require('express');
-const { reportBug, getProjectBugs, updateBug } = require('../controllers/bugController');
+const { reportBug, getProjectBugs, updateBug, editComment, deleteComment } = require('../controllers/bugController');
 const { protect } = require('../middleware/auth');
 const { upload } = require('../utils/cloudinary');
 
@@ -13,5 +13,10 @@ router.route('/project/:projectId')
 
 router.route('/:id')
   .put(upload.array('attachments', 5), updateBug);
+
+// Comment-level routes
+router.route('/:id/comments/:commentId')
+  .put(editComment)
+  .delete(deleteComment);
 
 module.exports = router;
