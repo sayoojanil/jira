@@ -272,13 +272,13 @@ const Navbar: React.FC = () => {
 
       {/* Action controls */}
       <div className="flex items-center gap-3">
-        <button
+        {/* <button
           onClick={toggleTheme}
           className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100/60 bg-white/60 text-black transition-all duration-300 hover:bg-sky-50 hover:text-sky-600"
           title="Toggle Light/Dark Theme"
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-        </button>
+        </button> */}
 
         <Badge count={unreadCount} size="small" offset={[-2, 2]} overflowCount={9}>
           <Dropdown
